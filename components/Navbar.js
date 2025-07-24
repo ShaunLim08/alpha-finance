@@ -1,5 +1,6 @@
 // components/Navbar.js
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { CustomConnectButton } from './CustomConnectButton';
 import { Home, ArrowLeftRight, Coins } from 'lucide-react';
@@ -19,7 +20,13 @@ export const Navbar = () => {
           <div className="flex items-center space-x-8">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg"></div>
+              <Image
+                src="/logo.png"
+                alt="Alpha Finance Logo"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="font-bold text-xl text-gray-800">
                 Alpha Finance
               </span>
