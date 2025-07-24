@@ -1,12 +1,5 @@
-// components/CustomConnectButton.js
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import {
-  useAccount,
-  useBalance,
-  useChainId,
-  useEnsName,
-  useEnsAvatar,
-} from 'wagmi';
+import { useAccount, useBalance, useChainId, useEnsName, useEnsAvatar } from 'wagmi';
 import { useState } from 'react';
 import { Copy, ExternalLink, QrCode, LogOut, ChevronDown } from 'lucide-react';
 import { formatEther } from 'viem';
@@ -23,11 +16,12 @@ export const CustomConnectButton = () => {
 
   const getChainColor = (chainId) => {
     const colors = {
-      1: 'bg-blue-500', // Ethereum
-      56: 'bg-yellow-500', // BSC
-      137: 'bg-purple-500', // Polygon
-      10: 'bg-red-500', // Optimism
-      42161: 'bg-blue-600', // Arbitrum
+      1: 'bg-blue-500',      // Ethereum
+      56: 'bg-yellow-500',   // BSC
+      137: 'bg-purple-500',  // Polygon
+      10: 'bg-red-500',      // Optimism
+      42161: 'bg-blue-600',  // Arbitrum
+      11155111: 'bg-gray-500', // Sepolia
     };
     return colors[chainId] || 'bg-gray-500';
   };
@@ -46,6 +40,7 @@ export const CustomConnectButton = () => {
       137: 'https://polygonscan.com/address/',
       10: 'https://optimistic.etherscan.io/address/',
       42161: 'https://arbiscan.io/address/',
+      11155111: 'https://sepolia.etherscan.io/address/',
     };
     const baseUrl = explorers[chainId] || explorers[1];
     return `${baseUrl}${address}`;
@@ -73,7 +68,7 @@ export const CustomConnectButton = () => {
           <div
             {...(!ready && {
               'aria-hidden': true,
-              style: {
+              'style': {
                 opacity: 0,
                 pointerEvents: 'none',
                 userSelect: 'none',
@@ -109,38 +104,25 @@ export const CustomConnectButton = () => {
                     onClick={() => setShowModal(!showModal)}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                   >
-                    <div
-                      className={`w-2 h-2 rounded-full ${getChainColor(
-                        chain.id
-                      )}`}
-                    />
+                    <div className={`w-2 h-2 rounded-full ${getChainColor(chain.id)}`} />
                     <span className="text-sm font-medium">{chain.name}</span>
                     <div className="h-4 w-px bg-gray-300" />
                     <div className="text-sm">
                       {balance && (
                         <span className="font-medium">
-                          {parseFloat(formatEther(balance.value)).toFixed(4)}{' '}
-                          {balance.symbol}
+                          {parseFloat(formatEther(balance.value)).toFixed(4)} {balance.symbol}
                         </span>
                       )}
                     </div>
                     <div className="h-4 w-px bg-gray-300" />
                     <div className="flex items-center gap-2">
                       {ensAvatar ? (
-                        <img
-                          src={ensAvatar}
-                          alt="ENS Avatar"
-                          className="w-6 h-6 rounded-full"
-                        />
+                        <img src={ensAvatar} alt="ENS Avatar" className="w-6 h-6 rounded-full" />
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-gradient-to-r from-blue-400 to-purple-400" />
                       )}
                       <span className="text-sm font-medium">
-                        {ensName ||
-                          `${account.address.slice(
-                            0,
-                            6
-                          )}...${account.address.slice(-4)}`}
+                        {ensName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
                       </span>
                     </div>
                     <ChevronDown className="w-4 h-4" />
@@ -152,20 +134,13 @@ export const CustomConnectButton = () => {
                       <div className="p-4 space-y-3">
                         <div className="text-center">
                           {ensAvatar ? (
-                            <img
-                              src={ensAvatar}
-                              alt="ENS Avatar"
-                              className="w-16 h-16 rounded-full mx-auto mb-2"
-                            />
+                            <img src={ensAvatar} alt="ENS Avatar" className="w-16 h-16 rounded-full mx-auto mb-2" />
                           ) : (
                             <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 mx-auto mb-2" />
                           )}
-                          {ensName && (
-                            <p className="font-semibold">{ensName}</p>
-                          )}
+                          {ensName && <p className="font-semibold">{ensName}</p>}
                           <p className="text-sm text-gray-600 font-mono">
-                            {account.address.slice(0, 6)}...
-                            {account.address.slice(-4)}
+                            {account.address.slice(0, 6)}...{account.address.slice(-4)}
                           </p>
                         </div>
 
@@ -200,11 +175,7 @@ export const CustomConnectButton = () => {
                             onClick={openChainModal}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                           >
-                            <div
-                              className={`w-3 h-3 rounded-full ${getChainColor(
-                                chainId
-                              )}`}
-                            />
+                            <div className={`w-3 h-3 rounded-full ${getChainColor(chainId)}`} />
                             Switch Network
                           </button>
 
@@ -222,11 +193,7 @@ export const CustomConnectButton = () => {
 
                         {showQR && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <QRCode
-                              value={account.address}
-                              size={200}
-                              className="mx-auto"
-                            />
+                            <QRCode value={account.address} size={200} className="mx-auto" />
                           </div>
                         )}
                       </div>

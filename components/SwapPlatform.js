@@ -307,6 +307,7 @@ const SwapPlatform = () => {
       137: 'https://polygonscan.com',
       10: 'https://optimistic.etherscan.io',
       42161: 'https://arbiscan.io',
+      11155111: 'https://sepolia.etherscan.io',
     };
     return explorers[chainId] || explorers[1];
   };
@@ -436,14 +437,15 @@ const SwapPlatform = () => {
           ) : (
             <>
               {/* Chain warning */}
-              {chainId && ![1, 56, 137, 10, 42161].includes(chainId) && (
-                <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2 text-orange-700">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">
-                    Please switch to a supported network
-                  </span>
-                </div>
-              )}
+              {chainId &&
+                ![1, 56, 137, 10, 42161, 11155111].includes(chainId) && (
+                  <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2 text-orange-700">
+                    <AlertCircle className="w-4 h-4" />
+                    <span className="text-sm">
+                      Please switch to a supported network
+                    </span>
+                  </div>
+                )}
 
               {/* From Token Section */}
               <div className="mb-4">
@@ -644,7 +646,8 @@ const SwapPlatform = () => {
                       !fromToken ||
                       !toToken ||
                       !amount ||
-                      (chainId && ![1, 56, 137, 10, 42161].includes(chainId))
+                      (chainId &&
+                        ![1, 56, 137, 10, 42161, 11155111].includes(chainId))
                     }
                     className="w-full py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                   >
