@@ -421,304 +421,307 @@ const SwapPlatform = () => {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] py-12 px-4">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Token Swap</h1>
+    <div className="w-full">
+      <div className="flex items-center gap-3 mb-6">
+        <h1 className="text-3xl font-bold">Token Swap</h1>
+        <span className="text-sm text-gray-500">by</span>
+        <img
+          src="/1inch.png"
+          alt="1inch"
+          className="h-8"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/32/0066CC/fff?text=1';
+          }}
+        />
+      </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6">
-          {/* Show connection prompt if not connected */}
-          {!isConnected ? (
-            <div className="text-center py-8">
-              <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600 mb-4">
-                Connect your wallet to start swapping
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Chain warning */}
-              {chainId &&
-                ![1, 56, 137, 10, 42161, 11155111].includes(chainId) && (
-                  <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2 text-orange-700">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="text-sm">
-                      Please switch to a supported network
-                    </span>
-                  </div>
-                )}
-
-              {/* From Token Section */}
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    From
-                  </label>
-                  <span className="text-xs text-gray-500">
-                    Balance: {getCurrentBalance().slice(0, 10)}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        {/* Show connection prompt if not connected */}
+        {!isConnected ? (
+          <div className="text-center py-8">
+            <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <p className="text-gray-600 mb-4">
+              Connect your wallet to start swapping
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Chain warning */}
+            {chainId &&
+              ![1, 56, 137, 10, 42161, 11155111].includes(chainId) && (
+                <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg flex items-center gap-2 text-orange-700">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">
+                    Please switch to a supported network
                   </span>
                 </div>
-                <div className="space-y-2">
-                  <TokenSelector
-                    token={fromToken}
-                    onClick={() => setShowFromTokenList(true)}
-                    label="You pay"
-                  />
-                  <input
-                    type="number"
-                    placeholder="0.0"
-                    value={amount}
-                    onChange={(e) => {
-                      setAmount(e.target.value);
-                      setSwapQuote(null);
-                    }}
-                    className="w-full p-3 border rounded-lg text-lg"
-                  />
-                </div>
-              </div>
+              )}
 
-              {/* Switch Button */}
-              <div className="flex justify-center my-2">
-                <button
-                  onClick={switchTokens}
-                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-                >
-                  <ArrowDownUp className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* To Token Section */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  To
+            {/* From Token Section */}
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  From
                 </label>
-                <div className="space-y-2">
-                  <TokenSelector
-                    token={toToken}
-                    onClick={() => setShowToTokenList(true)}
-                    label="You receive"
-                  />
-                  <div className="w-full p-3 border rounded-lg text-lg bg-gray-50">
-                    {swapQuote
-                      ? formatAmount(swapQuote.dstAmount, toToken.decimals)
-                      : '0.0'}
-                  </div>
+                <span className="text-xs text-gray-500">
+                  Balance: {getCurrentBalance().slice(0, 10)}
+                </span>
+              </div>
+              <div className="space-y-2">
+                <TokenSelector
+                  token={fromToken}
+                  onClick={() => setShowFromTokenList(true)}
+                  label="You pay"
+                />
+                <input
+                  type="number"
+                  placeholder="0.0"
+                  value={amount}
+                  onChange={(e) => {
+                    setAmount(e.target.value);
+                    setSwapQuote(null);
+                  }}
+                  className="w-full p-3 border rounded-lg text-lg"
+                />
+              </div>
+            </div>
+
+            {/* Switch Button */}
+            <div className="flex justify-center my-2">
+              <button
+                onClick={switchTokens}
+                className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                <ArrowDownUp className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* To Token Section */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                To
+              </label>
+              <div className="space-y-2">
+                <TokenSelector
+                  token={toToken}
+                  onClick={() => setShowToTokenList(true)}
+                  label="You receive"
+                />
+                <div className="w-full p-3 border rounded-lg text-lg bg-gray-50">
+                  {swapQuote
+                    ? formatAmount(swapQuote.dstAmount, toToken.decimals)
+                    : '0.0'}
                 </div>
               </div>
+            </div>
 
-              {/* Slippage Settings */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Slippage Tolerance
-                </label>
-                <div className="flex gap-2">
-                  {[0.5, 1, 2.5].map((value) => (
-                    <button
-                      key={value}
-                      onClick={() => setSlippage(value)}
-                      className={`px-4 py-2 rounded-lg ${
-                        slippage === value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 hover:bg-gray-200'
-                      }`}
-                    >
-                      {value}%
-                    </button>
-                  ))}
-                  <input
-                    type="number"
-                    placeholder="Custom"
-                    value={slippage}
-                    onChange={(e) =>
-                      setSlippage(parseFloat(e.target.value) || 0)
-                    }
-                    className="px-4 py-2 border rounded-lg w-24"
-                  />
-                </div>
+            {/* Slippage Settings */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Slippage Tolerance
+              </label>
+              <div className="flex gap-2">
+                {[0.5, 1, 2.5].map((value) => (
+                  <button
+                    key={value}
+                    onClick={() => setSlippage(value)}
+                    className={`px-4 py-2 rounded-lg ${
+                      slippage === value
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    {value}%
+                  </button>
+                ))}
+                <input
+                  type="number"
+                  placeholder="Custom"
+                  value={slippage}
+                  onChange={(e) => setSlippage(parseFloat(e.target.value) || 0)}
+                  className="px-4 py-2 border rounded-lg w-24"
+                />
               </div>
+            </div>
 
-              {/* Success Message */}
-              {successMessage && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700">
-                  <div className="text-2xl">🎉</div>
-                  <span className="text-sm">{successMessage}</span>
-                </div>
-              )}
+            {/* Success Message */}
+            {successMessage && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700">
+                <div className="text-2xl">🎉</div>
+                <span className="text-sm">{successMessage}</span>
+              </div>
+            )}
 
-              {/* Transaction Status */}
-              {(approvalTxHash || swapTxHash) && (
-                <div className="mb-4 p-4 bg-blue-50 rounded-lg space-y-2">
-                  {approvalTxHash && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-blue-700">
-                        Approval Transaction:
-                      </span>
-                      <a
-                        href={`${getBlockExplorerUrl(
-                          chainId
-                        )}/tx/${approvalTxHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                      >
-                        View
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
-                  {swapTxHash && (
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-blue-700">Swap Transaction:</span>
-                      <a
-                        href={`${getBlockExplorerUrl(
-                          chainId
-                        )}/tx/${swapTxHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                      >
-                        View
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">{error}</span>
-                </div>
-              )}
-
-              {/* Swap Quote Details */}
-              {swapQuote && (
-                <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">You pay</span>
-                    <span>
-                      {amount} {fromToken.symbol}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">You receive</span>
-                    <span>
-                      {formatAmount(swapQuote.dstAmount, toToken.decimals)}{' '}
-                      {toToken.symbol}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Estimated Gas</span>
-                    <span>{swapQuote.gas}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Price Impact</span>
-                    <span className="text-red-500">~{slippage}%</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                {needsApproval &&
-                fromToken?.address !==
-                  '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? (
-                  <button
-                    onClick={handleApprove}
-                    disabled={isApproving || isApprovalConfirming}
-                    className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-                  >
-                    {isApproving || isApprovalConfirming ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Approving {fromToken?.symbol}...
-                      </>
-                    ) : (
-                      `Approve ${fromToken?.symbol}`
-                    )}
-                  </button>
-                ) : !swapQuote ? (
-                  <button
-                    onClick={getSwapQuote}
-                    disabled={
-                      swapLoading ||
-                      !fromToken ||
-                      !toToken ||
-                      !amount ||
-                      (chainId &&
-                        ![1, 56, 137, 10, 42161, 11155111].includes(chainId))
-                    }
-                    className="w-full py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-                  >
-                    {swapLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Getting Quote...
-                      </>
-                    ) : (
-                      'Get Swap Quote'
-                    )}
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={executeSwap}
-                      disabled={
-                        isExecutingSwap || isSendingSwap || isSwapConfirming
-                      }
-                      className="w-full py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            {/* Transaction Status */}
+            {(approvalTxHash || swapTxHash) && (
+              <div className="mb-4 p-4 bg-blue-50 rounded-lg space-y-2">
+                {approvalTxHash && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-blue-700">Approval Transaction:</span>
+                    <a
+                      href={`${getBlockExplorerUrl(
+                        chainId
+                      )}/tx/${approvalTxHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                     >
-                      {isExecutingSwap || isSendingSwap || isSwapConfirming ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          {isSwapConfirming
-                            ? 'Confirming Swap...'
-                            : 'Executing Swap...'}
-                        </>
-                      ) : (
-                        'Execute Swap'
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setSwapQuote(null)}
-                      disabled={
-                        isExecutingSwap || isSendingSwap || isSwapConfirming
-                      }
-                      className="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      View
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                )}
+                {swapTxHash && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-blue-700">Swap Transaction:</span>
+                    <a
+                      href={`${getBlockExplorerUrl(chainId)}/tx/${swapTxHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                     >
-                      Cancel
-                    </button>
-                  </>
+                      View
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 )}
               </div>
-            </>
-          )}
-        </div>
+            )}
 
-        {/* Token List Modals */}
-        {showFromTokenList && (
-          <TokenList
-            onSelect={(token) => {
-              setFromToken(token);
-              setSwapQuote(null);
-            }}
-            onClose={() => setShowFromTokenList(false)}
-            excludeToken={toToken}
-          />
-        )}
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
 
-        {showToTokenList && (
-          <TokenList
-            onSelect={(token) => {
-              setToToken(token);
-              setSwapQuote(null);
-            }}
-            onClose={() => setShowToTokenList(false)}
-            excludeToken={fromToken}
-          />
+            {/* Swap Quote Details */}
+            {swapQuote && (
+              <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">You pay</span>
+                  <span>
+                    {amount} {fromToken.symbol}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">You receive</span>
+                  <span>
+                    {formatAmount(swapQuote.dstAmount, toToken.decimals)}{' '}
+                    {toToken.symbol}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Estimated Gas</span>
+                  <span>{swapQuote.gas}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Price Impact</span>
+                  <span className="text-red-500">~{slippage}%</span>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              {needsApproval &&
+              fromToken?.address !==
+                '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ? (
+                <button
+                  onClick={handleApprove}
+                  disabled={isApproving || isApprovalConfirming}
+                  className="w-full py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  {isApproving || isApprovalConfirming ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Approving {fromToken?.symbol}...
+                    </>
+                  ) : (
+                    `Approve ${fromToken?.symbol}`
+                  )}
+                </button>
+              ) : !swapQuote ? (
+                <button
+                  onClick={getSwapQuote}
+                  disabled={
+                    swapLoading ||
+                    !fromToken ||
+                    !toToken ||
+                    !amount ||
+                    (chainId &&
+                      ![1, 56, 137, 10, 42161, 11155111].includes(chainId))
+                  }
+                  className="w-full py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  {swapLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Getting Quote...
+                    </>
+                  ) : (
+                    'Get Swap Quote'
+                  )}
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={executeSwap}
+                    disabled={
+                      isExecutingSwap || isSendingSwap || isSwapConfirming
+                    }
+                    className="w-full py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  >
+                    {isExecutingSwap || isSendingSwap || isSwapConfirming ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {isSwapConfirming
+                          ? 'Confirming Swap...'
+                          : 'Executing Swap...'}
+                      </>
+                    ) : (
+                      'Execute Swap'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setSwapQuote(null)}
+                    disabled={
+                      isExecutingSwap || isSendingSwap || isSwapConfirming
+                    }
+                    className="w-full py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+            </div>
+          </>
         )}
       </div>
+
+      {/* Token List Modals */}
+      {showFromTokenList && (
+        <TokenList
+          onSelect={(token) => {
+            setFromToken(token);
+            setSwapQuote(null);
+          }}
+          onClose={() => setShowFromTokenList(false)}
+          excludeToken={toToken}
+        />
+      )}
+
+      {showToTokenList && (
+        <TokenList
+          onSelect={(token) => {
+            setToToken(token);
+            setSwapQuote(null);
+          }}
+          onClose={() => setShowToTokenList(false)}
+          excludeToken={fromToken}
+        />
+      )}
     </div>
   );
 };
