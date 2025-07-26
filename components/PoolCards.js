@@ -7,6 +7,7 @@ import {
   ArrowUp,
   ArrowDown,
   Coins,
+  Briefcase,
 } from 'lucide-react';
 import { useChainId } from 'wagmi';
 
@@ -237,14 +238,81 @@ const PoolCard = ({ pool, tokenMap }) => {
   );
 };
 
+const TopGainerCard = ({ coin, index, isLoser = false }) => {
+  const changePercentage = coin.usd_1y_change || 0;
+  const isPositive = changePercentage >= 0;
+
+  return (
+    <div className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold text-gray-400">#{index + 1}</span>
+          <img
+            src={coin.image}
+            alt={coin.name}
+            className="w-8 h-8 rounded-full"
+            onError={(e) => {
+              e.target.src = `https://via.placeholder.com/32/888/fff?text=${coin.symbol[0]}`;
+            }}
+          />
+          <div>
+            <div className="font-semibold text-sm">{coin.name}</div>
+            <div className="text-xs text-gray-500 uppercase">{coin.symbol}</div>
+          </div>
+        </div>
+        <a
+          href={`https://www.coingecko.com/en/coins/${coin.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-gray-600"
+        >
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-xs mt-3">
+        <div>
+          <span className="text-gray-500">Market Cap Rank:</span>
+          <div className="font-semibold">#{coin.market_cap_rank || 'N/A'}</div>
+        </div>
+        <div>
+          <span className="text-gray-500">Price (USD):</span>
+          <div className="font-semibold">{formatNumber(coin.usd)}</div>
+        </div>
+        <div>
+          <span className="text-gray-500">24h Volume:</span>
+          <div className="font-semibold">{formatNumber(coin.usd_24h_vol)}</div>
+        </div>
+        <div>
+          <span className="text-gray-500">24h Change:</span>
+          <div
+            className={`font-semibold flex items-center gap-1 ${
+              isPositive ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {isPositive ? (
+              <ArrowUp className="w-3 h-3" />
+            ) : (
+              <ArrowDown className="w-3 h-3" />
+            )}
+            {formatPercent(changePercentage)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const PoolCards = () => {
   const chainId = useChainId();
   const [trendingPools, setTrendingPools] = useState([]);
   const [topPools, setTopPools] = useState([]);
   const [trendingTokens, setTrendingTokens] = useState([]);
+  const [topGainersLosers, setTopGainersLosers] = useState([]);
   const [loadingTrending, setLoadingTrending] = useState(true);
   const [loadingTop, setLoadingTop] = useState(true);
   const [loadingTrendingTokens, setLoadingTrendingTokens] = useState(true);
+  const [loadingGainersLosers, setLoadingGainersLosers] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -255,6 +323,7 @@ export const PoolCards = () => {
     setLoadingTrending(true);
     setLoadingTop(true);
     setLoadingTrendingTokens(true);
+    setLoadingGainersLosers(true);
     setError(null);
 
     try {
@@ -284,6 +353,15 @@ export const PoolCards = () => {
         const trendingTokensData = await trendingTokensResponse.json();
         setTrendingTokens(trendingTokensData);
       }
+
+      // Fetch top gainers and losers
+      const gainersLosersResponse = await fetch(
+        `/api/coingecko/top-gainers-losers?chainId=${chainId}`
+      );
+      if (gainersLosersResponse.ok) {
+        const gainersLosersData = await gainersLosersResponse.json();
+        setTopGainersLosers(gainersLosersData);
+      }
     } catch (err) {
       console.error('Error fetching pool data:', err);
       setError('Failed to fetch pool data');
@@ -291,6 +369,7 @@ export const PoolCards = () => {
       setLoadingTrending(false);
       setLoadingTop(false);
       setLoadingTrendingTokens(false);
+      setLoadingGainersLosers(false);
     }
   };
 
@@ -390,6 +469,78 @@ export const PoolCards = () => {
     );
   };
 
+  const renderGainersLosersList = (data, loading, title, icon) => {
+    if (loading) {
+      return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            {icon}
+            <h3 className="text-lg font-semibold">{title}</h3>
+          </div>
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        </div>
+      );
+    }
+
+    const gainers = data.top_gainers?.slice(0, 5) || [];
+    const losers = data.top_losers?.slice(0, 5) || [];
+
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          {icon}
+          <h3 className="text-lg font-semibold">{title}</h3>
+        </div>
+        {gainers.length > 0 || losers.length > 0 ? (
+          <div className="max-h-96 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            {gainers.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-green-600 mb-2 flex items-center gap-1">
+                  <ArrowUp className="w-4 h-4" />
+                  Top Gainers
+                </h4>
+                <div className="space-y-2">
+                  {gainers.map((coin, index) => (
+                    <TopGainerCard
+                      key={coin.id}
+                      coin={coin}
+                      index={index}
+                      isLoser={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            {losers.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-red-600 mb-2 flex items-center gap-1">
+                  <ArrowDown className="w-4 h-4" />
+                  Top Losers
+                </h4>
+                <div className="space-y-2">
+                  {losers.map((coin, index) => (
+                    <TopGainerCard
+                      key={coin.id}
+                      coin={coin}
+                      index={index}
+                      isLoser={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-center py-4">
+            No gainers/losers data available
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="grid md:grid-cols-2 gap-6 mt-8">
       {renderPoolList(
@@ -410,11 +561,12 @@ export const PoolCards = () => {
         'Trending Tokens',
         <Coins className="w-5 h-5 text-green-500" />
       )}
-      {/* Placeholder for fourth card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold mb-4">Need Pro API for Top Gainers haha</h3>
-        <p className="text-gray-500">Might remove this card (Shaun)</p>
-      </div>
+      {renderGainersLosersList(
+        topGainersLosers,
+        loadingGainersLosers,
+        'Top Gainers & Losers',
+        <Briefcase className="w-5 h-5 text-purple-500" />
+      )}
     </div>
   );
 };
