@@ -1,29 +1,36 @@
-import Head from 'next/head';
-import { useAccount } from 'wagmi';
-import { Wallet, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { Wallet } from 'lucide-react';
+import AaveStakingCard from '../components/AaveStakingCard';
+import CompoundStakingCard from '../components/CompoundStakingCard';
+import CurveStakingCard from '../components/CurveStakingCard';
 
 export default function Stake() {
-  const { isConnected } = useAccount();
+  const [isConnected, setIsConnected] = useState(true);
 
   return (
-    <>
-      <Head>
-        <title>Stake - Alpha Finance</title>
-        <meta
-          name="description"
-          content="Stake your tokens and earn rewards on Alpha Finance"
-        />
-      </Head>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navbar placeholder */}
+      <div className="bg-white shadow-sm border-b border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Alpha Finance</h1>
+          <button
+            onClick={() => setIsConnected(!isConnected)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            {isConnected ? 'Disconnect' : 'Connect Wallet'}
+          </button>
+        </div>
+      </div>
 
-      <div className="min-h-[calc(100vh-64px)] py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-center mb-8">
+      <div className="py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-8 text-black">
             Stake Your Tokens
           </h1>
 
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            {!isConnected ? (
-              <div className="text-center py-12">
+          {!isConnected ? (
+            <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md mx-auto">
+              <div className="text-center">
                 <Wallet className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                 <p className="text-gray-600 mb-4">
                   Connect your wallet to start staking
@@ -32,45 +39,38 @@ export default function Stake() {
                   Use the connect button in the navigation bar
                 </p>
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto mb-6 flex items-center justify-center">
-                  <Info className="w-10 h-10 text-white" />
-                </div>
-                <h2 className="text-2xl font-semibold mb-4">Coming Soon!</h2>
-                <p className="text-gray-600 max-w-md mx-auto">
-                  We're working on bringing you the best staking experience.
-                  Check back soon to stake your tokens and earn rewards.
-                </p>
-                <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-700">
-                    💡 In the meantime, try our swap feature to exchange tokens
-                    at the best rates!
-                  </p>
+            </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <AaveStakingCard />
+                <CompoundStakingCard />
+                <CurveStakingCard />
+              </div>
+
+              <div className="bg-white rounded-xl shadow-sm p-6 max-w-4xl mx-auto">
+                <h2 className="text-xl font-semibold mb-4">
+                  Your Staking Overview
+                </h2>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
+                    <p className="text-sm text-gray-600 mb-1">Total Staked</p>
+                    <p className="text-2xl font-bold">$300.00</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+                    <p className="text-sm text-gray-600 mb-1">Total Earned</p>
+                    <p className="text-2xl font-bold text-green-600">$1.20</p>
+                  </div>
+                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-4">
+                    <p className="text-sm text-gray-600 mb-1">Average APY</p>
+                    <p className="text-2xl font-bold text-blue-600">6.9%</p>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Placeholder for future staking features */}
-          <div className="mt-8 grid md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold mb-2">Flexible Staking</h3>
-              <p className="text-sm text-gray-600">Stake and unstake anytime</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold mb-2">High APY</h3>
-              <p className="text-sm text-gray-600">Earn competitive rewards</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold mb-2">Multi-Token</h3>
-              <p className="text-sm text-gray-600">
-                Support for various tokens
-              </p>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
