@@ -105,21 +105,21 @@ const people = [
   {
     id: 2,
     name: 'Lau Jia Sheng',
-    designation: 'Tesla Owner',
+    designation: 'Evil Overlord',
     image:
       'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
   },
   {
     id: 3,
     name: 'Yew Foong Yik',
-    designation: 'Billionaire',
+    designation: 'ZhinHueys',
     image:
       'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60',
   },
   {
     id: 4,
     name: 'Jason Chu',
-    designation: 'Frontend Developer',
+    designation: '101% Gambler',
     image:
       'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGF2YXRhcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60',
   },
