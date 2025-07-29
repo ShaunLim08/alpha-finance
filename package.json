@@ -14,7 +14,7 @@
     "@vanilla-extract/css": "^1.14.0",
     "@vanilla-extract/sprinkles": "^1.6.1",
     "ethers": "^5.8.0",
-    "framer-motion": "^12.23.10",
+    "framer-motion": "^12.23.11",
     "lucide-react": "^0.525.0",
     "next": "^15.4.3",
     "qrcode.react": "^4.2.0",
@@ -28,6 +28,12 @@
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.4.3",
+    "hardhat": "^2.26.1",
     "tailwindcss": "^4"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

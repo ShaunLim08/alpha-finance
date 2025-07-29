@@ -46,7 +46,7 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
         <div className="flex items-center gap-2">
           <AAVETokenLogo />
           <div>
-            <p className="text-sm text-gray-600">Token: Link</p>
+            <p className="text-sm text-gray-600">Token: LINK</p>
             <p className="text-lg font-semibold">APY: 6.9%</p>
           </div>
         </div>
@@ -62,7 +62,7 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
         />
         <p className="text-sm text-gray-600 mt-1">
-          Balance: {walletBalance} AAVE
+          Balance: {walletBalance} LINK
         </p>
       </div>
 
@@ -98,11 +98,11 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-600">Current Position:</span>
-          <span className="font-medium">100 AAVE</span>
+          <span className="font-medium">100 LINK</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Yield Earned:</span>
-          <span className="font-medium text-green-600">0.4 AAVE</span>
+          <span className="font-medium text-green-600">0.4 LINK</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Total Supplied:</span>
