@@ -13,7 +13,7 @@
     "@tanstack/react-query": "^5.83.0",
     "@vanilla-extract/css": "^1.14.0",
     "@vanilla-extract/sprinkles": "^1.6.1",
-    "ethers": "^5.8.0",
+    "ethers": "^6.15.0",
     "framer-motion": "^12.23.11",
     "lucide-react": "^0.525.0",
     "next": "^15.4.3",
