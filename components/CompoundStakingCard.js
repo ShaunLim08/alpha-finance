@@ -449,7 +449,8 @@ const CompoundStakingCard = () => {
           });
 
           if (accounts.length > 0) {
-            const { ethers, BrowserProvider, Contract, formatUnits } = await import('ethers');
+            const { ethers, BrowserProvider, Contract, formatUnits } =
+              await import('ethers');
             const provider = new BrowserProvider(window.ethereum);
 
             // USDC contract
@@ -481,14 +482,8 @@ const CompoundStakingCard = () => {
 
             // Format the values using proper USDC decimals (6)
             setUserInfo({
-              totalSupplied: formatUnits(
-                detailedBalance.trackedSupplied,
-                6
-              ),
-              accumulatedYield: formatUnits(
-                detailedBalance.estimatedYield,
-                6
-              ),
+              totalSupplied: formatUnits(detailedBalance.trackedSupplied, 6),
+              accumulatedYield: formatUnits(detailedBalance.estimatedYield, 6),
             });
 
             // Get total supplied amount from the contract
@@ -499,18 +494,21 @@ const CompoundStakingCard = () => {
             // Get current APY with better error handling and calculation
             try {
               const supplyRate = await compoundContract.getCurrentSupplyRate();
-              console.log('Raw supply rate from contract:', supplyRate.toString());
-              
+              console.log(
+                'Raw supply rate from contract:',
+                supplyRate.toString()
+              );
+
               // Convert from Compound's rate format to APY percentage
               // Compound rates are typically in Wei (1e18) and per second
               const rateNumber = Number(supplyRate);
-              
+
               if (rateNumber > 0) {
                 // Convert rate per second to annual rate, then to percentage
                 const secondsPerYear = 365 * 24 * 60 * 60; // 31,536,000
                 const annualRate = rateNumber * secondsPerYear;
                 const apyPercentage = (annualRate / 1e18) * 100;
-                
+
                 console.log('Calculated APY:', apyPercentage);
                 setCurrentAPY(apyPercentage.toFixed(2));
                 setDebugInfo(`Rate: ${rateNumber.toExponential(2)}`);
@@ -523,9 +521,10 @@ const CompoundStakingCard = () => {
               console.error('Error fetching supply rate:', error);
               // Try to get advanced yield info as fallback
               try {
-                const advancedInfo = await compoundContract.getAdvancedYieldInfo(accounts[0]);
+                const advancedInfo =
+                  await compoundContract.getAdvancedYieldInfo(accounts[0]);
                 console.log('Advanced yield info:', advancedInfo);
-                
+
                 if (advancedInfo && advancedInfo.currentSupplyRate) {
                   const rateNumber = Number(advancedInfo.currentSupplyRate);
                   const secondsPerYear = 365 * 24 * 60 * 60;
@@ -538,7 +537,10 @@ const CompoundStakingCard = () => {
                   setDebugInfo('Using fallback rate');
                 }
               } catch (fallbackError) {
-                console.error('Fallback APY calculation failed:', fallbackError);
+                console.error(
+                  'Fallback APY calculation failed:',
+                  fallbackError
+                );
                 setCurrentAPY('6.50'); // Use reasonable default
                 setDebugInfo('Error - using default');
               }
@@ -566,7 +568,9 @@ const CompoundStakingCard = () => {
 
     setIsTransacting(true);
     try {
-      const { ethers, BrowserProvider, Contract, parseUnits } = await import('ethers');
+      const { ethers, BrowserProvider, Contract, parseUnits } = await import(
+        'ethers'
+      );
       const provider = new BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const accounts = await window.ethereum.request({
@@ -577,11 +581,7 @@ const CompoundStakingCard = () => {
       const amountInUnits = parseUnits(amount, 6);
 
       // First approve the contract to spend USDC
-      const usdcContract = new Contract(
-        USDC_TOKEN_ADDRESS,
-        ERC20_ABI,
-        signer
-      );
+      const usdcContract = new Contract(USDC_TOKEN_ADDRESS, ERC20_ABI, signer);
 
       // Check current allowance
       const currentAllowance = await usdcContract.allowance(
@@ -660,7 +660,9 @@ const CompoundStakingCard = () => {
 
     setIsTransacting(true);
     try {
-      const { ethers, BrowserProvider, Contract, parseUnits } = await import('ethers');
+      const { ethers, BrowserProvider, Contract, parseUnits } = await import(
+        'ethers'
+      );
       const provider = new BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
@@ -713,9 +715,7 @@ const CompoundStakingCard = () => {
           <div>
             <p className="text-sm text-gray-600">Token: USDC</p>
             <p className="text-lg font-semibold">APY: {currentAPY}%</p>
-            {debugInfo && (
-              <p className="text-xs text-gray-400">{debugInfo}</p>
-            )}
+            {debugInfo && <p className="text-xs text-gray-400">{debugInfo}</p>}
           </div>
         </div>
         <p className="text-sm text-gray-600">Type: Vault / Pool</p>
