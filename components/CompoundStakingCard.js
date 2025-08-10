@@ -1,23 +1,261 @@
 import React, { useState, useEffect } from 'react';
 
-// Contract configuration
-const CONTRACT_ADDRESS = '0xE1E084024d399D52aB094b44259A5b21bEF38641';
+// Contract configuration - UPDATED TO NEW CONTRACT
+const CONTRACT_ADDRESS = '0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e';
 const USDC_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';
 
-// Contract ABI (only the functions we need)
+// Updated Contract ABI - Full ABI from new deployment
 const CONTRACT_ABI = [
+  { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
+  { inputs: [], name: 'InvalidInt104', type: 'error' },
+  { inputs: [], name: 'InvalidInt256', type: 'error' },
+  { inputs: [], name: 'InvalidUInt104', type: 'error' },
+  { inputs: [], name: 'InvalidUInt128', type: 'error' },
+  { inputs: [], name: 'InvalidUInt64', type: 'error' },
+  { inputs: [], name: 'NegativeNumber', type: 'error' },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'EmergencyWithdrawal',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    name: 'USDCSupplied',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    name: 'USDCWithdrawn',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'firstSupplyAmount',
+        type: 'uint256',
+      },
+    ],
+    name: 'UserOnboarded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'yieldAmount',
+        type: 'uint256',
+      },
+    ],
+    name: 'YieldEarned',
+    type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'COMET',
+    outputs: [
+      { internalType: 'contract CometInterface', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'MIN_SUPPLY_AMOUNT',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'MIN_WITHDRAW_AMOUNT',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'RATE_SCALE',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'SECONDS_PER_YEAR',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'USDC',
+    outputs: [{ internalType: 'contract IERC20', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'USDC_PRICE_FEED',
+    outputs: [
+      { internalType: 'contract IPriceFeed', name: '', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'user', type: 'address' },
+      { internalType: 'uint256', name: 'daysAhead', type: 'uint256' },
+    ],
+    name: 'calculateEstimatedYield',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
   {
     inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
-    name: 'supplyUSDC',
+    name: 'emergencyWithdraw',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
-    name: 'withdrawUSDC',
-    outputs: [],
-    stateMutability: 'nonpayable',
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getAdvancedYieldInfo',
+    outputs: [
+      { internalType: 'uint64', name: 'currentSupplyRate', type: 'uint64' },
+      { internalType: 'uint256', name: 'currentUtilization', type: 'uint256' },
+      {
+        internalType: 'uint256',
+        name: 'estimatedAnnualYield',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getContractUSDCBalance',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getCurrentSupplyRate',
+    outputs: [{ internalType: 'uint64', name: '', type: 'uint64' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getDetailedBalance',
+    outputs: [
+      { internalType: 'uint256', name: 'compoundBalance', type: 'uint256' },
+      { internalType: 'uint256', name: 'trackedSupplied', type: 'uint256' },
+      { internalType: 'uint256', name: 'estimatedYield', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getMarketInfo',
+    outputs: [
+      { internalType: 'uint256', name: 'totalSupply', type: 'uint256' },
+      { internalType: 'uint256', name: 'currentUtilization', type: 'uint256' },
+      { internalType: 'address', name: 'baseToken', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getProtocolStats',
+    outputs: [
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getUserCompoundBalance',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -45,16 +283,40 @@ const CONTRACT_ABI = [
   },
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getUserCompoundBalance',
+    name: 'getUserUSDCAllowance',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [],
-    name: 'getCurrentSupplyRate',
-    outputs: [{ internalType: 'uint64', name: '', type: 'uint64' }],
+    name: 'owner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
+    name: 'supplyUSDC',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'recipient', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'supplyUSDCTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -62,6 +324,56 @@ const CONTRACT_ABI = [
     name: 'totalSuppliedAmount',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalUsers',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'newOwner', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: '', type: 'address' }],
+    name: 'userInfo',
+    outputs: [
+      { internalType: 'uint256', name: 'totalSupplied', type: 'uint256' },
+      { internalType: 'uint256', name: 'lastSupplyTime', type: 'uint256' },
+      { internalType: 'uint256', name: 'accumulatedYield', type: 'uint256' },
+      { internalType: 'bool', name: 'hasEverSupplied', type: 'bool' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'withdrawAllUSDC',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
+    name: 'withdrawUSDC',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'withdrawUSDCTo',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];
@@ -156,22 +468,24 @@ const CompoundStakingCard = () => {
               provider
             );
 
-            // Get user info
-            const userInfoData = await compoundContract.getUserInfo(
+            // Get detailed balance using getDetailedBalance function
+            const detailedBalance = await compoundContract.getDetailedBalance(
               accounts[0]
             );
+
+            // Format the values using proper USDC decimals (6)
             setUserInfo({
               totalSupplied: ethers.utils.formatUnits(
-                userInfoData.totalSupplied,
+                detailedBalance.trackedSupplied,
                 6
               ),
               accumulatedYield: ethers.utils.formatUnits(
-                userInfoData.accumulatedYield,
+                detailedBalance.estimatedYield,
                 6
               ),
             });
 
-            // Get total supplied
+            // Get total supplied amount from the contract
             const totalSuppliedAmount =
               await compoundContract.totalSuppliedAmount();
             setTotalSupplied(ethers.utils.formatUnits(totalSuppliedAmount, 6));

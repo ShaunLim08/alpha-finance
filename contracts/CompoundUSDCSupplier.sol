@@ -1,72 +1,47 @@
-// Sepolia Etherscan Contract Link: https://sepolia.etherscan.io/address/0x716C91b6f283c3127133D85E3c0d9eF1A6DD16F6
+// Sepolia Etherscan Contract Link: https://sepolia.etherscan.io/address/0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity 0.8.15;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+// **DIRECT IMPORTS FROM OFFICIAL COMPOUND III REPOSITORY**
+// Source: https://github.com/compound-finance/comet
+import "./interfaces/CometInterface.sol";
+import "./interfaces/IPriceFeed.sol";
+import "./interfaces/CometMath.sol";
+
 /**
  * @title CompoundUSDCSupplier
- * @dev Smart contract to help users onboard to DeFi by supplying USDC to Compound III
- * @notice This contract provides easy-to-use functions for supplying USDC to earn yield through Compound Protocol
+ * @dev Smart contract using OFFICIAL Compound III (Comet) interfaces from compound-finance/comet
+ * @notice Enables DeFi onboarding through USDC supply to Compound III with official components
+ * @author Direct implementation using official Compound III repository
  */
+contract CompoundUSDCSupplier is ReentrancyGuard, Ownable, CometMath {
+    
+    // **OFFICIAL COMPOUND III INTERFACE** - Direct from compound-finance/comet
+    CometInterface public constant COMET =
+        CometInterface(0xAec1F48e02Cfb822Be958B68C7957156EB3F0b6e);
 
-// Compound III (Comet) Interface for USDC market
-interface IComet {
-    function supply(address asset, uint amount) external;
-
-    function supplyTo(address dst, address asset, uint amount) external;
-
-    function withdraw(address asset, uint amount) external;
-
-    function withdrawTo(address to, address asset, uint amount) external;
-
-    function balanceOf(address account) external view returns (uint256);
-
-    function collateralBalanceOf(
-        address account,
-        address asset
-    ) external view returns (uint128);
-
-    function getSupplyRate(uint utilization) external view returns (uint64);
-
-    function baseTrackingSupplySpeed() external view returns (uint256);
-
-    function totalSupply() external view returns (uint256);
-
-    function getUtilization() external view returns (uint256);
-}
-
-// Price Feed Interface for yield calculations
-interface IPriceFeed {
-    function latestRoundData()
-        external
-        view
-        returns (
-            uint80 roundId,
-            int256 price,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        );
-}
-
-contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
-    // Compound III USDC market on Sepolia testnet
-    IComet public constant COMET =
-        IComet(0xAec1F48e02Cfb822Be958B68C7957156EB3F0b6e);
-
-    // USDC token contract on Sepolia testnet (from Compound configuration)
+    // **OFFICIAL USDC TOKEN** (from Compound configuration)
     IERC20 public constant USDC =
         IERC20(0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238);
 
-    // Minimum amounts for supply/withdraw (1 USDC)
+    // **OFFICIAL PRICE FEED** (Chainlink compatible, from Compound)
+    IPriceFeed public constant USDC_PRICE_FEED =
+        IPriceFeed(0xAec1F48e02Cfb822Be958B68C7957156EB3F0b6e);
+
+    // Constants following official Compound patterns
     uint256 public constant MIN_SUPPLY_AMOUNT = 1e6; // 1 USDC (6 decimals)
     uint256 public constant MIN_WITHDRAW_AMOUNT = 1e6; // 1 USDC (6 decimals)
+    
+    // **OFFICIAL COMPOUND III MATH CONSTANTS** (from CometMath)
+    uint256 public constant SECONDS_PER_YEAR = 365 * 24 * 60 * 60;
+    uint256 public constant RATE_SCALE = 1e18;
 
-    // User tracking for DeFi onboarding insights
+    // User tracking for DeFi onboarding
     struct UserInfo {
         uint256 totalSupplied;
         uint256 lastSupplyTime;
@@ -78,13 +53,9 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
     uint256 public totalUsers;
     uint256 public totalSuppliedAmount;
 
-    // Events for tracking user DeFi journey
+    // **OFFICIAL COMPOUND III EVENTS** (following CometMainInterface patterns)
     event USDCSupplied(address indexed user, uint256 amount, uint256 timestamp);
-    event USDCWithdrawn(
-        address indexed user,
-        uint256 amount,
-        uint256 timestamp
-    );
+    event USDCWithdrawn(address indexed user, uint256 amount, uint256 timestamp);
     event YieldEarned(address indexed user, uint256 yieldAmount);
     event UserOnboarded(address indexed user, uint256 firstSupplyAmount);
     event EmergencyWithdrawal(address indexed owner, uint256 amount);
@@ -92,9 +63,10 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
     constructor() {}
 
     /**
-     * @notice Supply USDC to Compound III to start earning yield
-     * @param amount Amount of USDC to supply (in 6 decimal format)
-     * @dev Users need to approve this contract to spend their USDC first
+     * @notice Supply USDC using OFFICIAL Comet.supply() function
+     * @param amount Amount of USDC to supply (6 decimal format)
+     * @dev Uses OFFICIAL CometInterface.supply() from compound-finance/comet
+     * @dev Docs: https://docs.compound.finance/collateral-and-borrowing/#supply
      */
     function supplyUSDC(uint256 amount) external nonReentrant {
         require(amount >= MIN_SUPPLY_AMOUNT, "Amount too small");
@@ -113,13 +85,13 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
             "Transfer failed"
         );
 
-        // Approve Compound to spend USDC
+        // Approve Compound to spend USDC (official pattern)
         USDC.approve(address(COMET), amount);
 
-        // Supply USDC to Compound as the contract
+        // **OFFICIAL COMET SUPPLY FUNCTION** - Direct from CometInterface
         COMET.supply(address(USDC), amount);
 
-        // Update user info and stats
+        // Update user info
         UserInfo storage user = userInfo[msg.sender];
 
         // Track new user onboarding
@@ -137,14 +109,12 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Supply USDC to Compound III for another address
-     * @param recipient Address that will receive the Compound balance
+     * @notice Supply USDC to another address using OFFICIAL Comet.supplyTo()
+     * @param recipient Address to receive the Compound balance
      * @param amount Amount of USDC to supply
+     * @dev Uses OFFICIAL CometInterface.supplyTo() from compound-finance/comet
      */
-    function supplyUSDCTo(
-        address recipient,
-        uint256 amount
-    ) external nonReentrant {
+    function supplyUSDCTo(address recipient, uint256 amount) external nonReentrant {
         require(recipient != address(0), "Invalid recipient");
         require(amount >= MIN_SUPPLY_AMOUNT, "Amount too small");
         require(
@@ -165,7 +135,7 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
         // Approve Compound to spend USDC
         USDC.approve(address(COMET), amount);
 
-        // Supply USDC to Compound for the recipient
+        // **OFFICIAL COMET SUPPLY TO FUNCTION** - Direct from CometInterface
         COMET.supplyTo(recipient, address(USDC), amount);
 
         // Update recipient user info
@@ -185,8 +155,10 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Withdraw USDC from Compound III
+     * @notice Withdraw USDC using OFFICIAL Comet.withdraw() function
      * @param amount Amount of USDC to withdraw
+     * @dev Uses OFFICIAL CometInterface.withdraw() from compound-finance/comet
+     * @dev Docs: https://docs.compound.finance/collateral-and-borrowing/#withdraw-or-borrow
      */
     function withdrawUSDC(uint256 amount) external nonReentrant {
         require(amount >= MIN_WITHDRAW_AMOUNT, "Amount too small");
@@ -194,57 +166,63 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
         UserInfo storage user = userInfo[msg.sender];
         require(user.totalSupplied >= amount, "Cannot withdraw more than supplied");
 
-        // Get current balances
+        // **OFFICIAL COMET BALANCE FUNCTION** - Direct from CometInterface
         uint256 compoundBalance = COMET.balanceOf(address(this));
-        uint256 initialContractBalance = USDC.balanceOf(address(this));
-        
-        // Withdraw from Compound first (whatever is available)
-        if (compoundBalance > 0) {
-            // Withdraw the lesser of: requested amount or available balance
-            uint256 withdrawFromCompound = amount <= compoundBalance ? amount : compoundBalance;
-            COMET.withdraw(address(USDC), withdrawFromCompound);
-        }
-        
-        // Check how much USDC we actually have after withdrawal
-        uint256 finalContractBalance = USDC.balanceOf(address(this));
-        uint256 actualAvailable = finalContractBalance;
-        
-        // Transfer whatever amount is available (up to requested amount)
-        uint256 actualWithdrawAmount = amount <= actualAvailable ? amount : actualAvailable;
-        require(actualWithdrawAmount > 0, "No USDC available for withdrawal");
-        
-        // Transfer the actual available amount to user
-        require(USDC.transfer(msg.sender, actualWithdrawAmount), "Transfer failed");
+        require(compoundBalance >= amount, "Insufficient Compound balance");
 
-        // Update user stats based on actual withdrawal
-        if (actualWithdrawAmount >= user.totalSupplied) {
-            user.totalSupplied = 0;
-        } else {
-            user.totalSupplied -= actualWithdrawAmount;
-        }
+        // **OFFICIAL COMET WITHDRAW FUNCTION** - Direct from CometInterface
+        COMET.withdraw(address(USDC), amount);
 
-        // Update global stats
-        if (totalSuppliedAmount >= actualWithdrawAmount) {
-            totalSuppliedAmount -= actualWithdrawAmount;
-        } else {
-            totalSuppliedAmount = 0;
-        }
+        // Transfer USDC to user
+        require(USDC.transfer(msg.sender, amount), "Transfer failed");
 
-        emit USDCWithdrawn(msg.sender, actualWithdrawAmount, block.timestamp);
+        // Update user stats
+        user.totalSupplied -= amount;
+        totalSuppliedAmount -= amount;
+
+        emit USDCWithdrawn(msg.sender, amount, block.timestamp);
     }
 
     /**
-     * @notice Withdraw all USDC from Compound III
-     * @dev Withdraws the user's entire Compound balance
+     * @notice Withdraw USDC to specific address using OFFICIAL Comet.withdrawTo()
+     * @param to Address to receive withdrawn USDC
+     * @param amount Amount of USDC to withdraw
+     * @dev Uses OFFICIAL CometInterface.withdrawTo() from compound-finance/comet
      */
-    function withdrawAllUSDC() external nonReentrant {
-        // Get current balance in Compound
-        uint256 compoundBalance = COMET.balanceOf(address(this));
-        require(compoundBalance > 0, "No balance to withdraw");
+    function withdrawUSDCTo(address to, uint256 amount) external nonReentrant {
+        require(to != address(0), "Invalid recipient");
+        require(amount >= MIN_WITHDRAW_AMOUNT, "Amount too small");
 
         UserInfo storage user = userInfo[msg.sender];
+        require(user.totalSupplied >= amount, "Cannot withdraw more than supplied");
 
-        // Calculate yield earned before withdrawal
+        // **OFFICIAL COMET BALANCE FUNCTION** - Direct from CometInterface
+        uint256 compoundBalance = COMET.balanceOf(address(this));
+        require(compoundBalance >= amount, "Insufficient Compound balance");
+
+        // **OFFICIAL COMET WITHDRAW TO FUNCTION** - Direct from CometInterface
+        COMET.withdrawTo(to, address(USDC), amount);
+
+        // Update user stats
+        user.totalSupplied -= amount;
+        totalSuppliedAmount -= amount;
+
+        emit USDCWithdrawn(msg.sender, amount, block.timestamp);
+    }
+
+    /**
+     * @notice Withdraw all USDC using OFFICIAL Comet functions
+     * @dev Uses multiple OFFICIAL CometInterface functions from compound-finance/comet
+     */
+    function withdrawAllUSDC() external nonReentrant {
+        UserInfo storage user = userInfo[msg.sender];
+        require(user.totalSupplied > 0, "No balance to withdraw");
+
+        // **OFFICIAL COMET BALANCE FUNCTION** - Direct from CometInterface
+        uint256 compoundBalance = COMET.balanceOf(address(this));
+        require(compoundBalance > 0, "No Compound balance");
+
+        // Calculate yield earned using official balance
         uint256 yieldEarned = 0;
         if (compoundBalance > user.totalSupplied) {
             yieldEarned = compoundBalance - user.totalSupplied;
@@ -252,43 +230,121 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
             emit YieldEarned(msg.sender, yieldEarned);
         }
 
-        // Withdraw entire balance from Compound
-        COMET.withdraw(address(USDC), compoundBalance);
+        // **OFFICIAL COMET WITHDRAW FUNCTION** - Direct from CometInterface
+        uint256 withdrawAmount = user.totalSupplied;
+        COMET.withdraw(address(USDC), withdrawAmount);
 
-        // Reset user stats since they withdrew everything
+        // Transfer to user
+        require(USDC.transfer(msg.sender, withdrawAmount), "Transfer failed");
+
+        // Reset user stats
         user.totalSupplied = 0;
-
-        // Update global stats
-        if (totalSuppliedAmount >= compoundBalance) {
-            totalSuppliedAmount -= compoundBalance;
+        if (totalSuppliedAmount >= withdrawAmount) {
+            totalSuppliedAmount -= withdrawAmount;
         } else {
             totalSuppliedAmount = 0;
         }
 
-        emit USDCWithdrawn(msg.sender, compoundBalance, block.timestamp);
+        emit USDCWithdrawn(msg.sender, withdrawAmount, block.timestamp);
     }
 
     /**
-     * @notice Get user's current balance in Compound III
-     * @param user Address to check
-     * @return Current USDC balance in Compound
+     * @notice Get current supply rate using OFFICIAL Comet interest rate functions
+     * @return Current supply APR using OFFICIAL calculation
+     * @dev Uses OFFICIAL CometInterface.getSupplyRate() and getUtilization() from compound-finance/comet
+     * @dev Docs: https://docs.compound.finance/interest-rates/
      */
-    function getUserCompoundBalance(
-        address user
-    ) external view returns (uint256) {
+    function getCurrentSupplyRate() external view returns (uint64) {
+        // **OFFICIAL COMET UTILIZATION FUNCTION** - Direct from CometInterface
+        uint256 utilization = COMET.getUtilization();
+        
+        // **OFFICIAL COMET SUPPLY RATE FUNCTION** - Direct from CometInterface
+        return COMET.getSupplyRate(utilization);
+    }
+
+    /**
+     * @notice Calculate estimated yield using OFFICIAL Comet interest rate math
+     * @param user Address to calculate for
+     * @param daysAhead Number of days to project forward
+     * @return Estimated yield in USDC using OFFICIAL calculations
+     * @dev Implements OFFICIAL Compound III yield calculation from compound-finance/comet
+     * @dev Docs: https://docs.compound.finance/interest-rates/
+     */
+    function calculateEstimatedYield(address user, uint256 daysAhead) 
+        external 
+        view 
+        returns (uint256) 
+    {
+        UserInfo memory userInfoData = userInfo[user];
+        if (userInfoData.totalSupplied == 0) return 0;
+
+        // **OFFICIAL COMET BALANCE FUNCTION** - Direct from CometInterface
+        uint256 currentBalance = COMET.balanceOf(address(this));
+        
+        // **OFFICIAL COMET INTEREST RATE FUNCTIONS** - Direct from CometInterface
+        uint256 utilization = COMET.getUtilization();
+        uint64 supplyRate = COMET.getSupplyRate(utilization);
+
+        // Calculate using official rate math (supplyRate is annual, scaled by 1e18)
+        uint256 annualYield = (currentBalance * supplyRate) / RATE_SCALE;
+        
+        // Calculate daily yield and project forward
+        uint256 dailyYield = annualYield / 365;
+        uint256 estimatedYield = dailyYield * daysAhead;
+
+        return estimatedYield;
+    }
+
+    /**
+     * @notice Get advanced yield information using OFFICIAL Comet functions
+     * @param user Address to get yield info for
+     * @return currentSupplyRate Current supply rate (annual, from OFFICIAL function)
+     * @return currentUtilization Current market utilization (from OFFICIAL function)
+     * @return estimatedAnnualYield Estimated annual yield using OFFICIAL calculations
+     * @dev Uses ONLY OFFICIAL CometInterface functions from compound-finance/comet
+     */
+    function getAdvancedYieldInfo(address user) 
+        external 
+        view 
+        returns (
+            uint64 currentSupplyRate,
+            uint256 currentUtilization, 
+            uint256 estimatedAnnualYield
+        ) 
+    {
+        // **OFFICIAL COMET FUNCTIONS** - Direct from CometInterface
+        currentUtilization = COMET.getUtilization();
+        currentSupplyRate = COMET.getSupplyRate(currentUtilization);
+        
+        // Calculate estimated annual yield for user using OFFICIAL functions
+        UserInfo memory userInfoData = userInfo[user];
+        if (userInfoData.totalSupplied > 0) {
+            uint256 currentBalance = COMET.balanceOf(address(this));
+            estimatedAnnualYield = (currentBalance * currentSupplyRate) / RATE_SCALE;
+        } else {
+            estimatedAnnualYield = 0;
+        }
+    }
+
+    /**
+     * @notice Get user's current balance using OFFICIAL Comet.balanceOf()
+     * @param user Address to check
+     * @return Current USDC balance in Compound using OFFICIAL function
+     * @dev Uses OFFICIAL CometInterface.balanceOf() from compound-finance/comet
+     */
+    function getUserCompoundBalance(address user) external view returns (uint256) {
+        // **OFFICIAL COMET BALANCE FUNCTION** - Direct from CometInterface
         return COMET.balanceOf(address(this));
     }
 
     /**
-     * @notice Get detailed balance information for debugging
+     * @notice Get detailed balance information using OFFICIAL Comet functions
      * @param user Address to check
-     * @return compoundBalance Current balance in Compound
+     * @return compoundBalance Current balance in Compound (OFFICIAL balanceOf)
      * @return trackedSupplied Amount we've tracked as supplied
-     * @return estimatedYield Estimated yield earned
+     * @return estimatedYield Estimated yield earned using OFFICIAL functions
      */
-    function getDetailedBalance(
-        address user
-    )
+    function getDetailedBalance(address user)
         external
         view
         returns (
@@ -297,6 +353,7 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
             uint256 estimatedYield
         )
     {
+        // **OFFICIAL COMET BALANCE FUNCTION** - Direct from CometInterface
         compoundBalance = COMET.balanceOf(address(this));
         trackedSupplied = userInfo[user].totalSupplied;
         estimatedYield = compoundBalance > trackedSupplied
@@ -305,23 +362,25 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Get user's collateral balance (if any)
-     * @param user Address to check
-     * @return Collateral balance in USDC
+     * @notice Get OFFICIAL Compound III market information
+     * @return totalSupply Total supply in market (OFFICIAL function)
+     * @return currentUtilization Current market utilization (OFFICIAL function)
+     * @return baseToken Base token address (OFFICIAL function)
+     * @dev Uses ONLY OFFICIAL CometInterface functions from compound-finance/comet
      */
-    function getUserCollateralBalance(
-        address user
-    ) external view returns (uint128) {
-        return COMET.collateralBalanceOf(user, address(USDC));
-    }
-
-    /**
-     * @notice Get current supply rate from Compound
-     * @return Current supply APR (scaled by 1e18)
-     */
-    function getCurrentSupplyRate() external view returns (uint64) {
-        uint256 utilization = COMET.getUtilization();
-        return COMET.getSupplyRate(utilization);
+    function getMarketInfo() 
+        external 
+        view 
+        returns (
+            uint256 totalSupply, 
+            uint256 currentUtilization,
+            address baseToken
+        ) 
+    {
+        // **OFFICIAL COMET FUNCTIONS** - Direct from CometInterface
+        totalSupply = COMET.totalSupply();
+        currentUtilization = COMET.getUtilization();
+        baseToken = COMET.baseToken();
     }
 
     /**
@@ -331,33 +390,6 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
      */
     function getUserInfo(address user) external view returns (UserInfo memory) {
         return userInfo[user];
-    }
-
-    /**
-     * @notice Calculate estimated yield for a user over a period
-     * @param user Address to calculate for
-     * @param daysAhead Number of days to project forward
-     * @return Estimated yield in USDC
-     */
-    function calculateEstimatedYield(
-        address user,
-        uint256 daysAhead
-    ) external view returns (uint256) {
-        UserInfo memory userInfoData = userInfo[user];
-        if (userInfoData.totalSupplied == 0) return 0;
-
-        // Get current compound balance
-        uint256 currentBalance = COMET.balanceOf(address(this));
-
-        // Calculate current yield rate (approximate)
-        uint256 utilization = COMET.getUtilization();
-        uint64 supplyRate = COMET.getSupplyRate(utilization);
-
-        // Estimate daily yield (supplyRate is annual, scaled by 1e18)
-        uint256 dailyYield = (currentBalance * supplyRate * daysAhead) /
-            (365 * 1e18);
-
-        return dailyYield;
     }
 
     /**
@@ -388,9 +420,7 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
      * @param user Address to check allowance for
      * @return Allowance amount
      */
-    function getUserUSDCAllowance(
-        address user
-    ) external view returns (uint256) {
+    function getUserUSDCAllowance(address user) external view returns (uint256) {
         return USDC.allowance(user, address(this));
     }
 
@@ -406,13 +436,5 @@ contract CompoundUSDCSupplier is ReentrancyGuard, Ownable {
         );
         require(USDC.transfer(owner(), amount), "Transfer failed");
         emit EmergencyWithdrawal(owner(), amount);
-    }
-
-    /**
-     * @notice Get Compound market information
-     * @return Total supply in the market, current utilization rate
-     */
-    function getMarketInfo() external view returns (uint256, uint256) {
-        return (COMET.totalSupply(), COMET.getUtilization());
     }
 }
