@@ -174,16 +174,6 @@ const PoolCard = ({ pool, tokenMap }) => {
             </div>
           </div>
         </div>
-        <a
-          href={`https://etherscan.io/address/${
-            pool.attributes?.address || ''
-          }`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-400 hover:text-gray-600"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </a>
       </div>
 
       <div className="grid grid-cols-2 gap-2 text-xs">
