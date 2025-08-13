@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Curve Logo Component
 const CurveLogo = () => (
@@ -26,9 +26,19 @@ const USDCLogo = () => (
   </svg>
 );
 
-const CurveStakingCard = ({ walletBalance = '0' }) => {
+const CurveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
   const [amount, setAmount] = useState('');
   const [activeTab, setActiveTab] = useState('stake');
+
+  // Send mock data to parent component (since this is not implemented yet)
+  useEffect(() => {
+    if (onDataUpdate) {
+      onDataUpdate({
+        totalSupplied: '0',
+        yieldEarned: '0',
+      });
+    }
+  }, [onDataUpdate]);
 
   const handleStake = () => {
     console.log(`Staking ${amount} USDC in Curve protocol`);
@@ -104,15 +114,15 @@ const CurveStakingCard = ({ walletBalance = '0' }) => {
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
           <span className="text-gray-600">Current Position:</span>
-          <span className="font-medium">100 USDC</span>
+          <span className="font-medium">0 USDC</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Yield Earned:</span>
-          <span className="font-medium text-green-600">0.4 USDC</span>
+          <span className="font-medium text-green-600">0 USDC</span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Total Supplied:</span>
-          <span className="font-medium">6 Million</span>
+          <span className="font-medium">0</span>
         </div>
       </div>
     </div>

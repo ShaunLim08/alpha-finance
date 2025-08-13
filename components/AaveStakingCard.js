@@ -311,7 +311,7 @@ const LINKTokenLogo = () => (
   <img src="/chainlink.png" alt="LINK Token Logo" className="w-6 h-6" />
 );
 
-const AaveStakingCard = ({ walletBalance = '0' }) => {
+const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
   const [amount, setAmount] = useState('');
   const [activeTab, setActiveTab] = useState('stake');
   const [supplyRate, setSupplyRate] = useState('0');
@@ -323,6 +323,16 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
   const [isWithdrawMode, setIsWithdrawMode] = useState(false);
 
   const { address, isConnected } = useAccount();
+
+  // Send data to parent component when it changes
+  useEffect(() => {
+    if (onDataUpdate) {
+      onDataUpdate({
+        totalSupplied: currentPosition,
+        yieldEarned: yieldEarned,
+      });
+    }
+  }, [currentPosition, yieldEarned, onDataUpdate]);
 
   // Read contract data
   const { data: linkSupplyRate } = useReadContract({
