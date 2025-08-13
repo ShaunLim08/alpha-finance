@@ -425,7 +425,7 @@ const USDCLogo = () => (
   <img src="/USDC.png" alt="USDC" className="w-6 h-6 object-contain" />
 );
 
-const CompoundStakingCard = () => {
+const CompoundStakingCard = ({ onDataUpdate }) => {
   const [amount, setAmount] = useState('');
   const [activeTab, setActiveTab] = useState('stake');
   const [usdcBalance, setUsdcBalance] = useState('0');
@@ -439,6 +439,16 @@ const CompoundStakingCard = () => {
   const [currentAPY, setCurrentAPY] = useState('Loading...');
   const [debugInfo, setDebugInfo] = useState('');
 
+  // Send data to parent component when it changes
+  useEffect(() => {
+    if (onDataUpdate && userInfo) {
+      onDataUpdate({
+        totalSupplied: userInfo.totalSupplied,
+        yieldEarned: userInfo.accumulatedYield,
+      });
+    }
+  }, [userInfo, onDataUpdate]);
+
   // Load Web3 data
   useEffect(() => {
     const loadData = async () => {
@@ -449,22 +459,21 @@ const CompoundStakingCard = () => {
           });
 
           if (accounts.length > 0) {
-            const { ethers, BrowserProvider, Contract, formatUnits } =
-              await import('ethers');
-            const provider = new BrowserProvider(window.ethereum);
+            const { ethers } = await import('ethers');
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
 
             // USDC contract
-            const usdcContract = new Contract(
+            const usdcContract = new ethers.Contract(
               USDC_TOKEN_ADDRESS,
               ERC20_ABI,
               provider
             );
             const balance = await usdcContract.balanceOf(accounts[0]);
-            const formattedBalance = formatUnits(balance, 6);
+            const formattedBalance = ethers.utils.formatUnits(balance, 6);
             setUsdcBalance(formattedBalance);
 
             // Compound supplier contract
-            const compoundContract = new Contract(
+            const compoundContract = new ethers.Contract(
               CONTRACT_ADDRESS,
               CONTRACT_ABI,
               provider
@@ -482,14 +491,20 @@ const CompoundStakingCard = () => {
 
             // Format the values using proper USDC decimals (6)
             setUserInfo({
-              totalSupplied: formatUnits(detailedBalance.trackedSupplied, 6),
-              accumulatedYield: formatUnits(detailedBalance.estimatedYield, 6),
+              totalSupplied: ethers.utils.formatUnits(
+                detailedBalance.trackedSupplied,
+                6
+              ),
+              accumulatedYield: ethers.utils.formatUnits(
+                detailedBalance.estimatedYield,
+                6
+              ),
             });
 
             // Get total supplied amount from the contract
             const totalSuppliedAmount =
               await compoundContract.totalSuppliedAmount();
-            setTotalSupplied(formatUnits(totalSuppliedAmount, 6));
+            setTotalSupplied(ethers.utils.formatUnits(totalSuppliedAmount, 6));
 
             // Get current APY with better error handling and calculation
             try {
@@ -568,20 +583,22 @@ const CompoundStakingCard = () => {
 
     setIsTransacting(true);
     try {
-      const { ethers, BrowserProvider, Contract, parseUnits } = await import(
-        'ethers'
-      );
-      const provider = new BrowserProvider(window.ethereum);
+      const { ethers } = await import('ethers');
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await provider.getSigner();
       const accounts = await window.ethereum.request({
         method: 'eth_accounts',
       });
 
       // Convert amount to USDC units (6 decimals)
-      const amountInUnits = parseUnits(amount, 6);
+      const amountInUnits = ethers.utils.parseUnits(amount, 6);
 
       // First approve the contract to spend USDC
-      const usdcContract = new Contract(USDC_TOKEN_ADDRESS, ERC20_ABI, signer);
+      const usdcContract = new ethers.Contract(
+        USDC_TOKEN_ADDRESS,
+        ERC20_ABI,
+        signer
+      );
 
       // Check current allowance
       const currentAllowance = await usdcContract.allowance(
@@ -600,7 +617,7 @@ const CompoundStakingCard = () => {
       }
 
       // Now stake the USDC
-      const compoundContract = new Contract(
+      const compoundContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
@@ -625,12 +642,12 @@ const CompoundStakingCard = () => {
   const handleWithdrawAll = async () => {
     setIsTransacting(true);
     try {
-      const { ethers, BrowserProvider, Contract } = await import('ethers');
-      const provider = new BrowserProvider(window.ethereum);
+      const { ethers } = await import('ethers');
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await provider.getSigner();
 
       // Withdraw all from Compound
-      const compoundContract = new Contract(
+      const compoundContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
@@ -660,17 +677,15 @@ const CompoundStakingCard = () => {
 
     setIsTransacting(true);
     try {
-      const { ethers, BrowserProvider, Contract, parseUnits } = await import(
-        'ethers'
-      );
-      const provider = new BrowserProvider(window.ethereum);
+      const { ethers } = await import('ethers');
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await provider.getSigner();
 
       // Convert amount to USDC units (6 decimals)
-      const amountInUnits = parseUnits(amount, 6);
+      const amountInUnits = ethers.utils.parseUnits(amount, 6);
 
       // Withdraw from Compound
-      const compoundContract = new Contract(
+      const compoundContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
