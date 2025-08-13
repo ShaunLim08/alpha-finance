@@ -460,7 +460,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
 
           if (accounts.length > 0) {
             const { ethers } = await import('ethers');
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const provider = new ethers.BrowserProvider(window.ethereum);
 
             // USDC contract
             const usdcContract = new ethers.Contract(
@@ -469,7 +469,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
               provider
             );
             const balance = await usdcContract.balanceOf(accounts[0]);
-            const formattedBalance = ethers.utils.formatUnits(balance, 6);
+            const formattedBalance = ethers.formatUnits(balance, 6);
             setUsdcBalance(formattedBalance);
 
             // Compound supplier contract
@@ -491,11 +491,11 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
 
             // Format the values using proper USDC decimals (6)
             setUserInfo({
-              totalSupplied: ethers.utils.formatUnits(
+              totalSupplied: ethers.formatUnits(
                 detailedBalance.trackedSupplied,
                 6
               ),
-              accumulatedYield: ethers.utils.formatUnits(
+              accumulatedYield: ethers.formatUnits(
                 detailedBalance.estimatedYield,
                 6
               ),
@@ -504,7 +504,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
             // Get total supplied amount from the contract
             const totalSuppliedAmount =
               await compoundContract.totalSuppliedAmount();
-            setTotalSupplied(ethers.utils.formatUnits(totalSuppliedAmount, 6));
+            setTotalSupplied(ethers.formatUnits(totalSuppliedAmount, 6));
 
             // Get current APY with better error handling and calculation
             try {
@@ -584,14 +584,14 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
     setIsTransacting(true);
     try {
       const { ethers } = await import('ethers');
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const accounts = await window.ethereum.request({
         method: 'eth_accounts',
       });
 
       // Convert amount to USDC units (6 decimals)
-      const amountInUnits = ethers.utils.parseUnits(amount, 6);
+      const amountInUnits = ethers.parseUnits(amount, 6);
 
       // First approve the contract to spend USDC
       const usdcContract = new ethers.Contract(
@@ -643,7 +643,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
     setIsTransacting(true);
     try {
       const { ethers } = await import('ethers');
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
       // Withdraw all from Compound
@@ -678,11 +678,11 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
     setIsTransacting(true);
     try {
       const { ethers } = await import('ethers');
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
       // Convert amount to USDC units (6 decimals)
-      const amountInUnits = ethers.utils.parseUnits(amount, 6);
+      const amountInUnits = ethers.parseUnits(amount, 6);
 
       // Withdraw from Compound
       const compoundContract = new ethers.Contract(
@@ -788,6 +788,10 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
 
       <div className="space-y-2 text-sm">
         <div className="flex justify-between">
+          <span className="text-gray-600">Total Supplied:</span>
+          <span className="font-medium">{formatNumber(totalSupplied)}</span>
+        </div>
+        <div className="flex justify-between">
           <span className="text-gray-600">Current Position:</span>
           <span className="font-medium">
             {parseFloat(userInfo.totalSupplied).toFixed(2)} USDC
@@ -798,10 +802,6 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
           <span className="font-medium text-green-600">
             {parseFloat(userInfo.accumulatedYield).toFixed(4)} USDC
           </span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Total Supplied:</span>
-          <span className="font-medium">{formatNumber(totalSupplied)}</span>
         </div>
       </div>
     </div>
