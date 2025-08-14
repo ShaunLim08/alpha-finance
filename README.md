@@ -4,6 +4,8 @@
 
 Alpha Finance integrates with AAVE, Compound, and 1inch to provide users with optimal trading routes and staking opportunities across Ethereum and other supported networks. Built with Next.js and Web3 technologies for seamless decentralized finance interactions.
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-alpha--finance-blue?style=for-the-badge&logo=github)](https://github.com/ShaunLim08/alpha-finance.git)
+
 ![Alpha Finance Home Page](public/HomePage.png)
 
 ## Table of Contents
