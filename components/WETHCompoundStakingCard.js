@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 
-// Contract configuration - UPDATED TO NEW CONTRACT
-const CONTRACT_ADDRESS = '0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e';
-const USDC_TOKEN_ADDRESS = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';
+// Contract configuration - WETH Compound Supplier
+const CONTRACT_ADDRESS = '0xd891831C0F7034545d55E538265749136720FAC6'; // Your deployed contract address
+const WETH_TOKEN_ADDRESS = '0x2D5ee574e710219a521449679A4A7f2B43f046ad'; // Sepolia WETH
 
-// Updated Contract ABI - Full ABI from new deployment
+// Contract ABI
 const CONTRACT_ABI = [
   { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
   { inputs: [], name: 'InvalidInt104', type: 'error' },
@@ -58,51 +59,51 @@ const CONTRACT_ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
-      },
-    ],
-    name: 'USDCSupplied',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
-      },
-    ],
-    name: 'USDCWithdrawn',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
-      {
-        indexed: false,
-        internalType: 'uint256',
         name: 'firstSupplyAmount',
         type: 'uint256',
       },
     ],
     name: 'UserOnboarded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    name: 'WETHSupplied',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    name: 'WETHWithdrawn',
     type: 'event',
   },
   {
@@ -158,27 +159,17 @@ const CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: 'USDC',
+    name: 'WETH',
     outputs: [{ internalType: 'contract IERC20', name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [],
-    name: 'USDC_PRICE_FEED',
+    name: 'WETH_PRICE_FEED',
     outputs: [
       { internalType: 'contract IPriceFeed', name: '', type: 'address' },
     ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'user', type: 'address' },
-      { internalType: 'uint256', name: 'daysAhead', type: 'uint256' },
-    ],
-    name: 'calculateEstimatedYield',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -190,23 +181,8 @@ const CONTRACT_ABI = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getAdvancedYieldInfo',
-    outputs: [
-      { internalType: 'uint64', name: 'currentSupplyRate', type: 'uint64' },
-      { internalType: 'uint256', name: 'currentUtilization', type: 'uint256' },
-      {
-        internalType: 'uint256',
-        name: 'estimatedAnnualYield',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [],
-    name: 'getContractUSDCBalance',
+    name: 'getContractWETHBalance',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -222,7 +198,7 @@ const CONTRACT_ABI = [
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getDetailedBalance',
     outputs: [
-      { internalType: 'uint256', name: 'compoundBalance', type: 'uint256' },
+      { internalType: 'uint128', name: 'compoundBalance', type: 'uint128' },
       { internalType: 'uint256', name: 'trackedSupplied', type: 'uint256' },
       { internalType: 'uint256', name: 'estimatedYield', type: 'uint256' },
     ],
@@ -254,7 +230,7 @@ const CONTRACT_ABI = [
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
     name: 'getUserCompoundBalance',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    outputs: [{ internalType: 'uint128', name: '', type: 'uint128' }],
     stateMutability: 'view',
     type: 'function',
   },
@@ -273,7 +249,7 @@ const CONTRACT_ABI = [
           },
           { internalType: 'bool', name: 'hasEverSupplied', type: 'bool' },
         ],
-        internalType: 'struct CompoundUSDCSupplier.UserInfo',
+        internalType: 'struct CompoundWETHSupplierFixed.UserInfo',
         name: '',
         type: 'tuple',
       },
@@ -283,7 +259,7 @@ const CONTRACT_ABI = [
   },
   {
     inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
-    name: 'getUserUSDCAllowance',
+    name: 'getUserWETHAllowance',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
@@ -304,17 +280,7 @@ const CONTRACT_ABI = [
   },
   {
     inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
-    name: 'supplyUSDC',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'recipient', type: 'address' },
-      { internalType: 'uint256', name: 'amount', type: 'uint256' },
-    ],
-    name: 'supplyUSDCTo',
+    name: 'supplyWETH',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -354,14 +320,14 @@ const CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: 'withdrawAllUSDC',
+    name: 'withdrawAllWETH',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
-    name: 'withdrawUSDC',
+    name: 'withdrawWETH',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -371,14 +337,14 @@ const CONTRACT_ABI = [
       { internalType: 'address', name: 'to', type: 'address' },
       { internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
-    name: 'withdrawUSDCTo',
+    name: 'withdrawWETHTo',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
 ];
 
-// ERC20 ABI for USDC
+// ERC20 ABI for WETH
 const ERC20_ABI = [
   {
     constant: true,
@@ -416,19 +382,19 @@ const ERC20_ABI = [
   },
 ];
 
-// Logo components using images from public directory
+// Logo components
 const CompoundLogo = () => (
   <img src="/Compound.png" alt="Compound" className="w-8 h-8 object-contain" />
 );
 
-const USDCLogo = () => (
-  <img src="/USDC.png" alt="USDC" className="w-6 h-6 object-contain" />
+const WETHLogo = () => (
+  <img src="/weth.png" alt="WETH" className="w-6 h-6 object-contain" />
 );
 
-const CompoundStakingCard = ({ onDataUpdate }) => {
+const WETHCompoundStakingCard = ({ onDataUpdate }) => {
   const [amount, setAmount] = useState('');
   const [activeTab, setActiveTab] = useState('stake');
-  const [usdcBalance, setUsdcBalance] = useState('0');
+  const [wethBalance, setWethBalance] = useState('0');
   const [isLoading, setIsLoading] = useState(true);
   const [isTransacting, setIsTransacting] = useState(false);
   const [userInfo, setUserInfo] = useState({
@@ -441,7 +407,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
 
   // Send data to parent component when it changes
   useEffect(() => {
-    if (onDataUpdate && userInfo) {
+    if (onDataUpdate) {
       onDataUpdate({
         totalSupplied: userInfo.totalSupplied,
         yieldEarned: userInfo.accumulatedYield,
@@ -462,15 +428,15 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
             const { ethers } = await import('ethers');
             const provider = new ethers.BrowserProvider(window.ethereum);
 
-            // USDC contract
-            const usdcContract = new ethers.Contract(
-              USDC_TOKEN_ADDRESS,
+            // WETH contract
+            const wethContract = new ethers.Contract(
+              WETH_TOKEN_ADDRESS,
               ERC20_ABI,
               provider
             );
-            const balance = await usdcContract.balanceOf(accounts[0]);
-            const formattedBalance = ethers.formatUnits(balance, 6);
-            setUsdcBalance(formattedBalance);
+            const balance = await wethContract.balanceOf(accounts[0]);
+            const formattedBalance = ethers.formatUnits(balance, 18);
+            setWethBalance(formattedBalance);
 
             // Compound supplier contract
             const compoundContract = new ethers.Contract(
@@ -479,99 +445,56 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
               provider
             );
 
-            console.log('Contract address:', CONTRACT_ADDRESS);
-            console.log('User address:', accounts[0]);
-
-            // Get detailed balance using getDetailedBalance function
+            // Get detailed balance info
             const detailedBalance = await compoundContract.getDetailedBalance(
               accounts[0]
             );
-
             console.log('Detailed balance:', detailedBalance);
 
-            // Format the values using proper USDC decimals (6)
+            // Format the values using proper WETH decimals (18)
             setUserInfo({
               totalSupplied: ethers.formatUnits(
                 detailedBalance.trackedSupplied,
-                6
+                18
               ),
               accumulatedYield: ethers.formatUnits(
                 detailedBalance.estimatedYield,
-                6
+                18
               ),
             });
 
-            // Get total supplied amount from the contract
+            // Get total supplied amount
             const totalSuppliedAmount =
               await compoundContract.totalSuppliedAmount();
-            setTotalSupplied(ethers.formatUnits(totalSuppliedAmount, 6));
+            setTotalSupplied(ethers.formatUnits(totalSuppliedAmount, 18));
 
             // Get current APY with better error handling and calculation
             try {
               const supplyRate = await compoundContract.getCurrentSupplyRate();
-              console.log(
-                'Raw supply rate from contract:',
-                supplyRate.toString()
-              );
-
-              // Convert from Compound's rate format to APY percentage
-              // Compound rates are typically in Wei (1e18) and per second
-              const rateNumber = Number(supplyRate);
-
-              if (rateNumber > 0) {
-                // Convert rate per second to annual rate, then to percentage
-                const secondsPerYear = 365 * 24 * 60 * 60; // 31,536,000
-                const annualRate = rateNumber * secondsPerYear;
-                const apyPercentage = (annualRate / 1e18) * 100;
-
-                console.log('Calculated APY:', apyPercentage);
-                setCurrentAPY(apyPercentage.toFixed(2));
-                setDebugInfo(`Rate: ${rateNumber.toExponential(2)}`);
-              } else {
-                console.log('Supply rate is 0, using fallback APY');
-                setCurrentAPY('0.00');
-                setDebugInfo('Rate is 0');
-              }
+              // Convert from rate per second to APY percentage
+              // supplyRate is scaled by 1e18, annual rate
+              const ratePerSecond = Number(supplyRate) / 1e18;
+              const annualRate = ratePerSecond * 365 * 24 * 60 * 60;
+              const apyPercentage = (annualRate * 100).toFixed(2);
+              setCurrentAPY(`${apyPercentage}%`);
             } catch (error) {
-              console.error('Error fetching supply rate:', error);
-              // Try to get advanced yield info as fallback
-              try {
-                const advancedInfo =
-                  await compoundContract.getAdvancedYieldInfo(accounts[0]);
-                console.log('Advanced yield info:', advancedInfo);
-
-                if (advancedInfo && advancedInfo.currentSupplyRate) {
-                  const rateNumber = Number(advancedInfo.currentSupplyRate);
-                  const secondsPerYear = 365 * 24 * 60 * 60;
-                  const annualRate = rateNumber * secondsPerYear;
-                  const apyPercentage = (annualRate / 1e18) * 100;
-                  setCurrentAPY(apyPercentage.toFixed(2));
-                  setDebugInfo('From advanced info');
-                } else {
-                  setCurrentAPY('6.50'); // Reasonable fallback for USDC
-                  setDebugInfo('Using fallback rate');
-                }
-              } catch (fallbackError) {
-                console.error(
-                  'Fallback APY calculation failed:',
-                  fallbackError
-                );
-                setCurrentAPY('6.50'); // Use reasonable default
-                setDebugInfo('Error - using default');
-              }
+              console.error('Error getting APY:', error);
+              setCurrentAPY('N/A');
             }
           }
         }
       } catch (error) {
         console.error('Error loading data:', error);
+        setDebugInfo(`Error: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadData();
-    const interval = setInterval(loadData, 15000); // Refresh every 15 seconds
 
+    // Refresh data every 30 seconds
+    const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -590,43 +513,37 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
         method: 'eth_accounts',
       });
 
-      // Convert amount to USDC units (6 decimals)
-      const amountInUnits = ethers.parseUnits(amount, 6);
+      // Convert amount to WETH units (18 decimals)
+      const amountInUnits = ethers.parseUnits(amount, 18);
 
-      // First approve the contract to spend USDC
-      const usdcContract = new ethers.Contract(
-        USDC_TOKEN_ADDRESS,
+      // First approve the contract to spend WETH
+      const wethContract = new ethers.Contract(
+        WETH_TOKEN_ADDRESS,
         ERC20_ABI,
         signer
       );
 
-      // Check current allowance
-      const currentAllowance = await usdcContract.allowance(
-        accounts[0],
-        CONTRACT_ADDRESS
+      console.log('Approving WETH...');
+      const approvalTx = await wethContract.approve(
+        CONTRACT_ADDRESS,
+        amountInUnits
       );
+      await approvalTx.wait();
+      console.log('WETH approved');
 
-      if (currentAllowance < amountInUnits) {
-        console.log('Approving USDC...');
-        const approveTx = await usdcContract.approve(
-          CONTRACT_ADDRESS,
-          amountInUnits
-        );
-        await approveTx.wait();
-        console.log('USDC approved');
-      }
-
-      // Now stake the USDC
+      // Now supply WETH to Compound
       const compoundContract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         signer
       );
-      console.log('Staking USDC...');
-      const stakeTx = await compoundContract.supplyUSDC(amountInUnits);
-      await stakeTx.wait();
 
-      alert('Successfully staked ' + amount + ' USDC!');
+      console.log('Supplying WETH to Compound...');
+      const supplyTx = await compoundContract.supplyWETH(amountInUnits);
+      await supplyTx.wait();
+      console.log('WETH supplied successfully');
+
+      alert('WETH staked successfully!');
       setAmount('');
 
       // Refresh data
@@ -652,18 +569,19 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
         CONTRACT_ABI,
         signer
       );
-      console.log('Withdrawing all USDC...');
-      const withdrawTx = await compoundContract.withdrawAllUSDC();
-      await withdrawTx.wait();
 
-      alert('Successfully withdrawn all USDC!');
-      setAmount('');
+      console.log('Withdrawing all WETH from Compound...');
+      const withdrawTx = await compoundContract.withdrawAllWETH();
+      await withdrawTx.wait();
+      console.log('All WETH withdrawn successfully');
+
+      alert('All WETH withdrawn successfully!');
 
       // Refresh data
       window.location.reload();
     } catch (error) {
-      console.error('Error withdrawing all:', error);
-      alert('Error withdrawing all: ' + error.message);
+      console.error('Error withdrawing:', error);
+      alert('Error withdrawing: ' + error.message);
     } finally {
       setIsTransacting(false);
     }
@@ -681,8 +599,8 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      // Convert amount to USDC units (6 decimals)
-      const amountInUnits = ethers.parseUnits(amount, 6);
+      // Convert amount to WETH units (18 decimals)
+      const amountInUnits = ethers.parseUnits(amount, 18);
 
       // Withdraw from Compound
       const compoundContract = new ethers.Contract(
@@ -690,11 +608,13 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
         CONTRACT_ABI,
         signer
       );
-      console.log('Withdrawing USDC...');
-      const withdrawTx = await compoundContract.withdrawUSDC(amountInUnits);
-      await withdrawTx.wait();
 
-      alert('Successfully withdrawn ' + amount + ' USDC!');
+      console.log('Withdrawing WETH from Compound...');
+      const withdrawTx = await compoundContract.withdrawWETH(amountInUnits);
+      await withdrawTx.wait();
+      console.log('WETH withdrawn successfully');
+
+      alert('WETH withdrawn successfully!');
       setAmount('');
 
       // Refresh data
@@ -709,27 +629,38 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
 
   // Format large numbers
   const formatNumber = (num) => {
-    const n = parseFloat(num);
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + ' Million';
-    if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
-    return n.toFixed(2);
+    const number = parseFloat(num);
+    if (isNaN(number)) return '0.00';
+    if (number >= 1000000) return `${(number / 1000000).toFixed(2)}M`;
+    if (number >= 1000) return `${(number / 1000).toFixed(2)}K`;
+    return number.toFixed(2);
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <CompoundLogo />
-          <h3 className="text-xl font-bold">Compound</h3>
+          <h3 className="text-xl font-bold">Compound WETH</h3>
         </div>
       </div>
 
       <div className="space-y-3 mb-4">
         <div className="flex items-center gap-2">
-          <USDCLogo />
+          <WETHLogo />
           <div>
-            <p className="text-sm text-gray-600">Token: USDC</p>
-            <p className="text-lg font-semibold">APY: {currentAPY}%</p>
+            <p className="text-sm text-gray-600">Token: WETH</p>
+            <p className="text-lg font-semibold">APY: {currentAPY}</p>
           </div>
         </div>
         <p className="text-sm text-gray-600">Type: Vault / Pool</p>
@@ -745,10 +676,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
           disabled={isTransacting}
         />
         <p className="text-sm text-gray-600 mt-1">
-          Balance:{' '}
-          {isLoading
-            ? 'Loading...'
-            : `${parseFloat(usdcBalance).toFixed(2)} USDC`}
+          Balance: {formatNumber(wethBalance)} WETH
         </p>
       </div>
 
@@ -756,7 +684,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
         <button
           onClick={() => {
             setActiveTab('stake');
-            if (amount && !isTransacting) handleStake();
+            if (amount) handleStake();
           }}
           disabled={isTransacting}
           className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
@@ -770,7 +698,7 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
         <button
           onClick={() => {
             setActiveTab('withdraw');
-            if (amount && !isTransacting) handleWithdraw();
+            if (amount) handleWithdraw();
           }}
           disabled={isTransacting}
           className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
@@ -789,24 +717,30 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
         <div className="flex justify-between">
           <span className="text-gray-600">Total Supplied:</span>
           <span className="font-medium">
-            {formatNumber(totalSupplied)} USDC
+            {formatNumber(totalSupplied)} WETH
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Current Position:</span>
           <span className="font-medium">
-            {parseFloat(userInfo.totalSupplied).toFixed(2)} USDC
+            {formatNumber(userInfo.totalSupplied)} WETH
           </span>
         </div>
         <div className="flex justify-between">
           <span className="text-gray-600">Yield Earned:</span>
           <span className="font-medium text-green-600">
-            {parseFloat(userInfo.accumulatedYield).toFixed(4)} USDC
+            {formatNumber(userInfo.accumulatedYield)} WETH
           </span>
         </div>
       </div>
+
+      {debugInfo && (
+        <div className="mt-4 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs text-yellow-800">
+          Debug: {debugInfo}
+        </div>
+      )}
     </div>
   );
 };
 
-export default CompoundStakingCard;
+export default WETHCompoundStakingCard;

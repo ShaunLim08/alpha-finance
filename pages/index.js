@@ -104,21 +104,19 @@ const people = [
   {
     id: 2,
     name: 'Lau Jia Sheng',
-    designation: 'Evil Overlord',
-    image:
-      'https://media.newyorker.com/photos/59095bb86552fa0be682d9d0/master/w_2560%2Cc_limit/Monkey-Selfie.jpg',
+    designation: 'Chief Gangster',
+    image: '/team/jia.jpg',
   },
   {
     id: 3,
     name: 'Yew Foong Yik',
-    designation: "ZhinHuey's",
-    image:
-      'https://media.newyorker.com/photos/59095bb86552fa0be682d9d0/master/w_2560%2Cc_limit/Monkey-Selfie.jpg',
+    designation: 'Chief Gorilla OFficer',
+    image: '/team/yew.jpeg',
   },
   {
     id: 4,
     name: 'Jason Chu',
-    designation: '101% Gambler',
+    designation: 'Chief Chimpanzee Officer',
     image: '/team/Winter.png',
   },
 ];
