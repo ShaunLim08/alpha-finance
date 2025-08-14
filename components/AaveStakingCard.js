@@ -129,7 +129,7 @@ const MARKET_INTERACTIONS_ABI = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
+    inputs: [],
     name: 'getTotalSupplied',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
@@ -266,7 +266,7 @@ const MARKET_INTERACTIONS_ABI = [
 
 // Contract addresses (you'll need to deploy and update these)
 const MARKET_INTERACTIONS_CONTRACT =
-  '0xc8D58A37b72aB6427928d80Fa84479843ceF1393'; // Replace with actual deployed contract address
+  '0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D'; // Replace with actual deployed contract address
 const LINK_TOKEN_ADDRESS = '0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5'; // Sepolia LINK
 // We'll get the aToken address dynamically from the Pool contract
 
@@ -303,25 +303,15 @@ const ERC20_ABI = [
 
 // Aave Logo Component
 const AaveLogo = () => (
-  <svg className="w-8 h-8" viewBox="0 0 256 256" fill="none">
-    <rect width="256" height="256" rx="128" fill="#B6509E" />
-    <path d="M128 64L168 192H152L144 168H112L104 192H88L128 64Z" fill="white" />
-  </svg>
+  <img src="/aave.png" alt="Aave Logo" className="w-8 h-8" />
 );
 
-// AAVE Token Logo
-const AAVETokenLogo = () => (
-  <svg className="w-6 h-6" viewBox="0 0 256 256" fill="none">
-    <rect width="256" height="256" rx="128" fill="#B6509E" />
-    <path
-      d="M128 64L168 192H152L144 168H112L104 192H88L128 64Z"
-      fill="white"
-      opacity="0.9"
-    />
-  </svg>
+// LINK Token Logo
+const LINKTokenLogo = () => (
+  <img src="/chainlink.png" alt="LINK Token Logo" className="w-6 h-6" />
 );
 
-const AaveStakingCard = ({ walletBalance = '0' }) => {
+const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
   const [amount, setAmount] = useState('');
   const [activeTab, setActiveTab] = useState('stake');
   const [supplyRate, setSupplyRate] = useState('0');
@@ -333,6 +323,16 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
   const [isWithdrawMode, setIsWithdrawMode] = useState(false);
 
   const { address, isConnected } = useAccount();
+
+  // Send data to parent component when it changes
+  useEffect(() => {
+    if (onDataUpdate) {
+      onDataUpdate({
+        totalSupplied: currentPosition,
+        yieldEarned: yieldEarned,
+      });
+    }
+  }, [currentPosition, yieldEarned, onDataUpdate]);
 
   // Read contract data
   const { data: linkSupplyRate } = useReadContract({
@@ -431,13 +431,15 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
       hash: approveHash,
     });
 
-  const { isLoading: isSupplyConfirming, isSuccess: isSupplySuccess } = useWaitForTransactionReceipt({
-    hash: supplyHash,
-  });
+  const { isLoading: isSupplyConfirming, isSuccess: isSupplySuccess } =
+    useWaitForTransactionReceipt({
+      hash: supplyHash,
+    });
 
-  const { isLoading: isWithdrawConfirming, isSuccess: isWithdrawSuccess } = useWaitForTransactionReceipt({
-    hash: withdrawHash,
-  });
+  const { isLoading: isWithdrawConfirming, isSuccess: isWithdrawSuccess } =
+    useWaitForTransactionReceipt({
+      hash: withdrawHash,
+    });
 
   const {
     isLoading: isATokenApproveConfirming,
@@ -536,9 +538,7 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
     address: MARKET_INTERACTIONS_CONTRACT,
     abi: MARKET_INTERACTIONS_ABI,
     functionName: 'getTotalSupplied',
-    args: [address],
     enabled:
-      !!address &&
       !!MARKET_INTERACTIONS_CONTRACT &&
       MARKET_INTERACTIONS_CONTRACT !== '0x...',
   });
@@ -629,15 +629,18 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
         setYieldEarned('0.0000');
       }
 
-      // Total supplied from getTotalSupplied
-      const totalSuppliedAmount = totalSuppliedData
-        ? parseFloat(formatEther(totalSuppliedData)).toFixed(4)
-        : '0.0000';
-      setTotalSupplied(totalSuppliedAmount);
-    } else {
+    }
+    
+    // Total supplied from getTotalSupplied (net amount in contract pool)
+    // Shows regardless of connection status since it's global data
+    const totalSuppliedAmount = totalSuppliedData
+      ? parseFloat(formatEther(totalSuppliedData)).toFixed(4)
+      : '0.0000';
+    setTotalSupplied(totalSuppliedAmount);
+    
+    if (!isConnected || !address) {
       setCurrentPosition('--');
       setYieldEarned('--');
-      setTotalSupplied('--');
     }
   }, [
     currentPositionData,
@@ -711,7 +714,7 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
     }
   }, [isSupplySuccess]);
 
-  // Refresh page after successful withdraw transaction  
+  // Refresh page after successful withdraw transaction
   useEffect(() => {
     if (isWithdrawSuccess) {
       console.log('✅ Withdraw transaction successful - refreshing page...');
@@ -802,7 +805,7 @@ const AaveStakingCard = ({ walletBalance = '0' }) => {
 
       <div className="space-y-3 mb-4">
         <div className="flex items-center gap-2">
-          <AAVETokenLogo />
+          <LINKTokenLogo />
           <div>
             <p className="text-sm text-gray-600">Token: LINK</p>
             <p className="text-lg font-semibold">

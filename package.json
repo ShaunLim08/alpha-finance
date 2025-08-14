@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "mocha test/*.test.js"
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.1.0",
@@ -26,8 +27,10 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "chai": "^5.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.3",
+    "mocha": "^11.7.1",
     "tailwindcss": "^4"
   }
 }

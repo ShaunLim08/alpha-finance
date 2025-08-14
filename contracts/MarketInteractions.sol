@@ -19,6 +19,9 @@ contract MarketInteractions {
     mapping(address => uint256) public userTotalSupplied;
     mapping(address => uint256) public userTotalWithdrawn;
     mapping(address => uint256) public userOriginalSupply;
+    
+    // Global tracking for total supplied through this contract
+    uint256 public contractTotalSupplied;
 
     constructor(address _addressProvider) {
         ADDRESSES_PROVIDER = IPoolAddressesProvider(_addressProvider);
@@ -159,6 +162,9 @@ contract MarketInteractions {
         // Track supply for yield calculation
         userTotalSupplied[msg.sender] += _amount;
         
+        // Track global total supplied through this contract
+        contractTotalSupplied += _amount;
+        
         // Initialize original supply if this is the first supply
         if (userOriginalSupply[msg.sender] == 0) {
             userOriginalSupply[msg.sender] = _amount;
@@ -188,6 +194,10 @@ contract MarketInteractions {
         
         // Track withdrawal for yield calculation
         userTotalWithdrawn[msg.sender] += actualWithdrawn;
+        
+        // Subtract from global total supplied through this contract
+        contractTotalSupplied = contractTotalSupplied >= actualWithdrawn ? 
+            contractTotalSupplied - actualWithdrawn : 0;
         
         return actualWithdrawn;
     }
@@ -260,9 +270,9 @@ contract MarketInteractions {
         return currentBalance > netPosition ? currentBalance - netPosition : 0;
     }
 
-    // Get total supplied (total amount user has supplied to the pool including withdrawals)
-    function getTotalSupplied(address _user) external view returns (uint256) {
-        return userTotalSupplied[_user];
+    // Get total amount deposited by users through this contract only
+    function getTotalSupplied() external view returns (uint256) {
+        return contractTotalSupplied;
     }
 
     function withdraw(address _tokenAddress) external onlyOwner {
