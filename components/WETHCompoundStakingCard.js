@@ -664,6 +664,14 @@ const WETHCompoundStakingCard = ({ onDataUpdate }) => {
           </div>
         </div>
         <p className="text-sm text-gray-600">Type: Vault / Pool</p>
+        <a
+          href="https://app.uniswap.org/swap?chain=sepolia&inputCurrency=NATIVE&outputCurrency=0x2D5ee574e710219a521449679A4A7f2B43f046ad"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="uniswap-link inline-flex items-center gap-1 text-sm"
+        >
+          🦄 Swap your testnet WETH on Uniswap →
+        </a>
       </div>
 
       <div className="mb-4">

@@ -151,13 +151,13 @@ export default function Home() {
               />
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-5xl md:text-6xl font-bold text-black mb-6">
               Welcome to{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
                 Alpha Finance
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
               Get the <strong>Alpha</strong> - Make informed trading decisions
               with real-time market data, or play it safe with steady staking
               rewards across multiple chains
@@ -235,7 +235,8 @@ export default function Home() {
             </p>
             {!isConnected && (
               <p className="text-sm text-gray-500 mb-8">
-                Click the &quot;Connect Wallet&quot; button in the top right to begin
+                Click the &quot;Connect Wallet&quot; button in the top right to
+                begin
               </p>
             )}
 
