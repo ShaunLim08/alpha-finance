@@ -183,6 +183,12 @@ The landing page provides an overview of Alpha Finance's core capabilities:
 
 ## Technical Architecture
 
+### 🏗️ **Solution Architecture**
+
+![Alpha Finance Solution Architecture](public/solutionarchitecture.jpg)
+
+The diagram above illustrates the complete technical stack and data flow of Alpha Finance, showing how users interact with DeFi protocols through our application layer.
+
 ### 🏗️ **Frontend Stack**
 
 - **Framework**: Next.js with React
@@ -235,7 +241,7 @@ alpha-finance/
 │   └── stake.js        # Staking dashboard
 ├── contracts/          # Smart contracts
 ├── public/            # Static assets
-├── styles/            # CSS files
+└── styles/            # CSS files
 ```
 
 ## Development
@@ -274,10 +280,18 @@ alpha-finance/
 
 3. **Deploy to network:**
    ```bash
-   npx hardhat deploy --network sepolia
+   npx hardhat deploy --network [network-name]
    ```
 
-#### Contract Addresses (Verify before use)
+#### Contract Addresses
+
+**Sepolia Testnet (Verified Contracts):**
+
+- **MarketInteractions (AAVE LINK)**: [`0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D`](https://sepolia.etherscan.io/address/0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D)
+- **Compound USDC Supplier**: [`0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e`](https://sepolia.etherscan.io/address/0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e)
+- **Compound WETH Supplier**: [`0xd891831C0F7034545d55E538265749136720FAC6`](https://sepolia.etherscan.io/address/0xd891831C0F7034545d55E538265749136720FAC6)
+
+**Token Addresses (Verify before use):**
 
 - **USDC**: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`
 - **WETH**: `0x2D5ee574e710219a521449679A4A7f2B43f046ad`
