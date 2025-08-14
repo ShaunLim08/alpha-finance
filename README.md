@@ -14,7 +14,6 @@ Alpha Finance integrates with AAVE, Compound, and 1inch to provide users with op
 - [Technical Architecture](#technical-architecture)
 - [Development](#development)
 - [API Documentation](#api-documentation)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Features
