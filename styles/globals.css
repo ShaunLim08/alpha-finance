@@ -21,8 +21,8 @@ body {
 
 /* Only override text content, not backgrounds, borders, or icons */
 p,
-span:not(.bg-gradient-to-r):not(.text-transparent),
-div:not([class*="bg-"]):not([class*="border-"]),
+span:not(.bg-gradient-to-r):not(.text-transparent):not(.text-white),
+div:not([class*='bg-']):not([class*='border-']):not(.text-white),
 li {
   color: #000000 !important;
 }
@@ -54,8 +54,10 @@ a:not(.uniswap-link) {
   text-decoration: underline;
 }
 
-/* Preserve UI element colors */
-.text-white {
+/* Preserve UI element colors with maximum specificity */
+.text-white,
+div.text-white,
+span.text-white {
   color: #ffffff !important;
 }
 
