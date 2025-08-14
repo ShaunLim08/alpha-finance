@@ -129,7 +129,7 @@ const MARKET_INTERACTIONS_ABI = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'address', name: '_user', type: 'address' }],
+    inputs: [],
     name: 'getTotalSupplied',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
@@ -266,7 +266,7 @@ const MARKET_INTERACTIONS_ABI = [
 
 // Contract addresses (you'll need to deploy and update these)
 const MARKET_INTERACTIONS_CONTRACT =
-  '0xc8D58A37b72aB6427928d80Fa84479843ceF1393'; // Replace with actual deployed contract address
+  '0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D'; // Replace with actual deployed contract address
 const LINK_TOKEN_ADDRESS = '0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5'; // Sepolia LINK
 // We'll get the aToken address dynamically from the Pool contract
 
@@ -538,9 +538,7 @@ const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
     address: MARKET_INTERACTIONS_CONTRACT,
     abi: MARKET_INTERACTIONS_ABI,
     functionName: 'getTotalSupplied',
-    args: [address],
     enabled:
-      !!address &&
       !!MARKET_INTERACTIONS_CONTRACT &&
       MARKET_INTERACTIONS_CONTRACT !== '0x...',
   });
@@ -631,15 +629,18 @@ const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
         setYieldEarned('0.0000');
       }
 
-      // Total supplied from getTotalSupplied
-      const totalSuppliedAmount = totalSuppliedData
-        ? parseFloat(formatEther(totalSuppliedData)).toFixed(4)
-        : '0.0000';
-      setTotalSupplied(totalSuppliedAmount);
-    } else {
+    }
+    
+    // Total supplied from getTotalSupplied (net amount in contract pool)
+    // Shows regardless of connection status since it's global data
+    const totalSuppliedAmount = totalSuppliedData
+      ? parseFloat(formatEther(totalSuppliedData)).toFixed(4)
+      : '0.0000';
+    setTotalSupplied(totalSuppliedAmount);
+    
+    if (!isConnected || !address) {
       setCurrentPosition('--');
       setYieldEarned('--');
-      setTotalSupplied('--');
     }
   }, [
     currentPositionData,
@@ -813,14 +814,6 @@ const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
           </div>
         </div>
         <p className="text-sm text-gray-600">Type: Vault / Pool</p>
-        <a
-          href="https://app.uniswap.org/swap?chain=sepolia&inputCurrency=NATIVE&outputCurrency=0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="uniswap-link inline-flex items-center gap-1 text-sm"
-        >
-          🦄 Swap your testnet LINK on Uniswap →
-        </a>
       </div>
 
       <div className="mb-4">
