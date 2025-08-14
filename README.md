@@ -290,6 +290,7 @@ alpha-finance/
 **Sepolia Testnet (Verified Contracts):**
 
 - **MarketInteractions (AAVE LINK)**: [`0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D`](https://sepolia.etherscan.io/address/0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D)
+- **aLink Pool Token**: `0x3FfAf50D4F4E96eB78f2407c090b72e86eCaed24`
 - **Compound USDC Supplier**: [`0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e`](https://sepolia.etherscan.io/address/0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e)
 - **Compound WETH Supplier**: [`0xd891831C0F7034545d55E538265749136720FAC6`](https://sepolia.etherscan.io/address/0xd891831C0F7034545d55E538265749136720FAC6)
 
