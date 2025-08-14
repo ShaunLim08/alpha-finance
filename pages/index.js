@@ -235,7 +235,7 @@ export default function Home() {
             </p>
             {!isConnected && (
               <p className="text-sm text-gray-500 mb-8">
-                Click the "Connect Wallet" button in the top right to begin
+                Click the &quot;Connect Wallet&quot; button in the top right to begin
               </p>
             )}
 
