@@ -628,16 +628,15 @@ const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
         });
         setYieldEarned('0.0000');
       }
-
     }
-    
+
     // Total supplied from getTotalSupplied (net amount in contract pool)
     // Shows regardless of connection status since it's global data
     const totalSuppliedAmount = totalSuppliedData
       ? parseFloat(formatEther(totalSuppliedData)).toFixed(4)
       : '0.0000';
     setTotalSupplied(totalSuppliedAmount);
-    
+
     if (!isConnected || !address) {
       setCurrentPosition('--');
       setYieldEarned('--');
@@ -814,6 +813,14 @@ const AaveStakingCard = ({ walletBalance = '0', onDataUpdate }) => {
           </div>
         </div>
         <p className="text-sm text-gray-600">Type: Vault / Pool</p>
+        <a
+          href="https://app.uniswap.org/swap?chain=sepolia&inputCurrency=NATIVE&outputCurrency=0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="uniswap-link inline-flex items-center gap-1 text-sm"
+        >
+          🦄 Swap your testnet LINK on Uniswap →
+        </a>
       </div>
 
       <div className="mb-4">
