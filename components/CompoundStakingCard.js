@@ -733,6 +733,14 @@ const CompoundStakingCard = ({ onDataUpdate }) => {
           </div>
         </div>
         <p className="text-sm text-gray-600">Type: Vault / Pool</p>
+        <a
+          href="https://app.uniswap.org/swap?chain=sepolia&inputCurrency=NATIVE&outputCurrency=0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="uniswap-link inline-flex items-center gap-1 text-sm"
+        >
+          🦄 Swap your testnet USDC on Uniswap →
+        </a>
       </div>
 
       <div className="mb-4">

@@ -113,8 +113,8 @@ export default function Stake() {
   return (
     <div className="py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-black">
-          Stake Your Tokens
+        <h1 className="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 bg-clip-text text-transparent">
+          Stake Your Tokens on Testnet!
         </h1>
 
         {!isConnected ? (
@@ -152,9 +152,9 @@ export default function Stake() {
               )}
 
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
+                <div className="bg-gradient-to-r from-yellow-50 via-amber-50 to-orange-50 rounded-lg p-4 border border-yellow-200">
                   <p className="text-sm text-gray-600 mb-1">Total Staked</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-2xl font-bold text-yellow-700">
                     ${totalStakedUSD.toFixed(2)}
                   </p>
                   {!isLoadingPrices && (
