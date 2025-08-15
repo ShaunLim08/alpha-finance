@@ -4,7 +4,7 @@
 
 Alpha Finance integrates with AAVE, Compound, and 1inch to provide users with optimal trading routes and staking opportunities across Ethereum and other supported networks. Built with Next.js and Web3 technologies for seamless decentralized finance interactions.
 
-[![GitHub Repository](https://img.shields.io/badge/GitHub-alpha--finance-blue?style=for-the-badge&logo=github)](https://github.com/ShaunLim08/alpha-finance.git)
+https://github.com/ShaunLim08/alpha-finance.git
 
 ![Alpha Finance Home Page](public/HomePage.png)
 
@@ -67,11 +67,62 @@ Alpha Finance integrates with AAVE, Compound, and 1inch to provide users with op
 
 2. **Install dependencies:**
 
+   > **Note**: We provide all packages separately because `npm install` was not working for us. You can try the individual installations below or use the alternative command at the end.
+
+   **Core Framework & React:**
+
+   ```bash
+   npm install next@15.4.3
+   npm install react@19.1.0 react-dom@19.1.0
+   ```
+
+   **Web3 & Wallet Integration:**
+
+   ```bash
+   npm install @rainbow-me/rainbowkit@2.1.0
+   npm install wagmi@2.16.0
+   npm install viem@2.33.0
+   npm install ethers@6.15.0
+   ```
+
+   **UI & Styling:**
+
+   ```bash
+   npm install @vanilla-extract/css@1.14.0 @vanilla-extract/sprinkles@1.6.1
+   npm install framer-motion@12.23.11
+   npm install lucide-react@0.525.0
+   npm install qrcode.react@4.2.0
+   ```
+
+   **Data Management:**
+
+   ```bash
+   npm install @tanstack/react-query@5.83.0
+   ```
+
+   **Development Dependencies:**
+
+   ```bash
+   npm install --save-dev eslint@9 eslint-config-next@15.4.3
+   npm install --save-dev @eslint/eslintrc@3
+   npm install --save-dev tailwindcss@4 @tailwindcss/postcss@4
+   npm install --save-dev hardhat@2.26.1
+   ```
+
+   **Alternative: Install all at once**
+
    ```bash
    npm install
    ```
 
-3. **Environment Setup:**
+3. **(Example) Install Compound Finance Integration :**
+
+   ```bash
+   # Install Compound Finance Comet for USDC & WETH (if needed)
+   npm install https://github.com/compound-finance/comet.git
+   ```
+
+4. **Environment Setup:**
 
    Copy the environment template:
 
@@ -89,13 +140,13 @@ Alpha Finance integrates with AAVE, Compound, and 1inch to provide users with op
    COINGECKO_PRO_API_KEY=your_coingecko_pro_api_key
    ```
 
-4. **Run the application:**
+5. **Run the application:**
 
    ```bash
    npm run dev
    ```
 
-5. **Open your browser:**
+6. **Open your browser:**
    Navigate to `http://localhost:3000`
 
 ### Required API Keys
@@ -290,6 +341,7 @@ alpha-finance/
 **Sepolia Testnet (Verified Contracts):**
 
 - **MarketInteractions (AAVE LINK)**: [`0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D`](https://sepolia.etherscan.io/address/0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D)
+- **aLink Pool Token**: `0x3FfAf50D4F4E96eB78f2407c090b72e86eCaed24`
 - **Compound USDC Supplier**: [`0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e`](https://sepolia.etherscan.io/address/0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e)
 - **Compound WETH Supplier**: [`0xd891831C0F7034545d55E538265749136720FAC6`](https://sepolia.etherscan.io/address/0xd891831C0F7034545d55E538265749136720FAC6)
 
@@ -298,7 +350,6 @@ alpha-finance/
 - **USDC**: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`
 - **WETH**: `0x2D5ee574e710219a521449679A4A7f2B43f046ad`
 - **ChainLink**: `0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5`
-- **aLink Pool Token**: `0x3FfAf50D4F4E96eB78f2407c090b72e86eCaed24` (You will get once you stake)
 
 ### 📁 **Public Assets**
 
