@@ -4,6 +4,7 @@ pragma abicoder v2;
 
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
+//THIS FILE IS DEPRECATED, JUST PUT HERE FOR REFERENCE PURPOSE
 //deployed address: 0x69852e31A0c08b42C2f2e165137C60260Ee2566c
 
 interface IERC20 {
