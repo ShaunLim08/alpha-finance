@@ -341,7 +341,6 @@ alpha-finance/
 **Sepolia Testnet (Verified Contracts):**
 
 - **MarketInteractions (AAVE LINK)**: [`0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D`](https://sepolia.etherscan.io/address/0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D)
-- **aLink Pool Token**: `0x3FfAf50D4F4E96eB78f2407c090b72e86eCaed24`
 - **Compound USDC Supplier**: [`0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e`](https://sepolia.etherscan.io/address/0x5557270F0628369A7E1Fc44F7b0Bb63dD603d34e)
 - **Compound WETH Supplier**: [`0xd891831C0F7034545d55E538265749136720FAC6`](https://sepolia.etherscan.io/address/0xd891831C0F7034545d55E538265749136720FAC6)
 
@@ -350,6 +349,7 @@ alpha-finance/
 - **USDC**: `0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238`
 - **WETH**: `0x2D5ee574e710219a521449679A4A7f2B43f046ad`
 - **ChainLink**: `0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5`
+- **aLink Pool Token**: `0x3FfAf50D4F4E96eB78f2407c090b72e86eCaed24`
 
 ### 📁 **Public Assets**
 
@@ -393,7 +393,6 @@ The `/public` directory contains:
 - **1inch API**: DEX aggregation and swap routing
 - **CoinGecko API**: Market data and price feeds
 - **GeckoTerminal**: DeFi pool analytics and trending data
-- **Protocol APIs**: Direct integration with AAVE and Compound
 
 ## License
 

@@ -266,7 +266,7 @@ const MARKET_INTERACTIONS_ABI = [
 
 // Contract addresses (you'll need to deploy and update these)
 const MARKET_INTERACTIONS_CONTRACT =
-  '0x19ab1aBC4B4e5d6A114297ec23969773b9a5736D'; // Replace with actual deployed contract address
+  '0x0EFEd5187d2Af39D5c29155568fDd0925e3651A9'; // Replace with actual deployed contract address
 const LINK_TOKEN_ADDRESS = '0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5'; // Sepolia LINK
 // We'll get the aToken address dynamically from the Pool contract
 
